@@ -88,6 +88,9 @@ class AocArgs:
     def getOutput(self):
         return self._output
     
+    def getTestFlag():
+        return AocArgs.g_sTestFlag
+    
     def makeScriptFileName(sDayNumber):
         return './' + AocArgs.g_sScriptFileNamePrefix + sDayNumber\
             + AocArgs.g_sScriptFileNamePostfix

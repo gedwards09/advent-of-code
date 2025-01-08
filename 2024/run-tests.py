@@ -1,6 +1,5 @@
 import os
 from utils.AocArgs import AocArgs
-from utils.AocTester import AocTester
 
 def _runAndCheck(iDayNumber):
     sDayNumber = str(iDayNumber)
@@ -13,7 +12,7 @@ def _runAndCheck(iDayNumber):
             rc = os.system(sCommand)
 
 def _makeTesterCommand(sScriptFileName, sPartNumber):
-    return ' '.join(['python3', sScriptFileName, sPartNumber, AocArgs.g_sTestFlag])
+    return ' '.join(['python3', sScriptFileName, sPartNumber, AocArgs.getTestFlag()])
 
 def __main__():
     iTestNumber = 1
