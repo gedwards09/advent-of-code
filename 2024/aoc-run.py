@@ -1,10 +1,12 @@
 import os
 import sys
+from utils.AocArgs import AocArgs
 
 g_sInputFileDirectoryName = 'inputs'
 g_sScriptFileNamePrefix = 'day-'
 g_sScriptFileNameSuffix = '.py'
 g_sPartArg = '--part'
+g_sTestArg = '--test'
 g_sFormatExceptionString = 'format: ./aoc-run.py day-number [' + g_sPartArg + '=(1|2); default=1]'
 g_sInputTextFileNameSuffix = '.txt'
 
@@ -30,10 +32,9 @@ def __main__():
             raise Exception()
     except Exception:
         raise Exception('argument day-number must be an integer from 1 to 25')
-    sScriptFileName =  './' + g_sScriptFileNamePrefix + sDayNumber + g_sScriptFileNameSuffix
-    sInputTextFileName = './' + g_sInputFileDirectoryName + '/' + sDayNumber + g_sInputTextFileNameSuffix
-    partArg = _getPartArg(sys.argv)
-    cmd = ' '.join(['python3', sScriptFileName, sInputTextFileName, partArg])
+    sScriptFileName =  './' + AocArgs.g_sScriptFileNamePrefix + sDayNumber + AocArgs.g_sScriptFileNamePostfix
+    sPartArg = _getPartArg(sys.argv)
+    cmd = ' '.join(['python3', sScriptFileName, sPartArg])
     rc = os.system(cmd)
 
 if __name__ == "__main__":

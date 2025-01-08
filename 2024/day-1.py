@@ -1,5 +1,6 @@
 import sys
 from utils.AocArgs import AocArgs
+from utils.AocTester import AocTester
 
 def alg(args):
     if args.PartNumber == 1:
@@ -23,7 +24,7 @@ def transpose(arr):
         return [[int(arr[rowNum][colNum]) for rowNum in range(len(arr))]\
                 for colNum in range(len(arr[0]))]
     
-def getDistance(arr1,arr2):
+def getDistance(arr1, arr2):
     if len(arr1) != len(arr2):
         raise Exception()
     dist = 0
@@ -51,7 +52,8 @@ def alg_2(fileName):
 
 def __main__():
     args = AocArgs(sys.argv)
-    print(alg(args))
+    value = alg(args)
+    AocTester.test(args, value)
 
 if __name__ == "__main__":
     __main__()
