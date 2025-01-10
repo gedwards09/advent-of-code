@@ -64,6 +64,7 @@ class AocArgs:
     # static
     def _parseDayNumber(argv):
         return AocArgs._parseScriptFileName(argv)\
+            .translate(str.maketrans({'\\' : '/'}))\
             .split('/')[-1]\
             .replace(AocArgs.g_sScriptFileNamePrefix,'')\
             .replace(AocArgs.g_sScriptFileNamePostfix, '')
