@@ -1,3 +1,4 @@
+from time import time
 from utils.AocArgs import AocArgs
 
 class AocController:
@@ -8,8 +9,10 @@ class AocController:
         self._fpAlg2 = fpAlg2
 
     def Execute(self):
+        tStart = time()
         value = self._doAlg()
-        self._doCheck(value)
+        tTime = time() - tStart
+        self._doCheck(value, tTime)
 
     def _doAlg(self):
         if self._args.getPartNumber() == 1:
@@ -17,12 +20,14 @@ class AocController:
         elif self._args.getPartNumber() == 2:
             return self._fpAlg2(self._args.getInputFileName())
 
-    def _doCheck(self, value):
+    def _doCheck(self, value, tTime):
         if self._args.isVerbose():
             print(value)
         else:
             assert(value == self._args.getOutput())
-            print(self._getPassMessage())
+            print(self._getPassMessage(tTime))
 
-    def _getPassMessage(self):
-        return self._args.getScriptFileName() + ' Part ' + str(self._args.getPartNumber()) + ' Passed'
+    def _getPassMessage(self, tTime):
+        return self._args.getScriptFileName() + ' Part '\
+            + str(self._args.getPartNumber()) + ' Passed ({:.3f} s)'\
+            .format(tTime)
