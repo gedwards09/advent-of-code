@@ -1,13 +1,23 @@
 class Map2D:
 
-    def __init__(self, sFileName):
-        self._map = self._initMap(sFileName)
+    def __init__(self, sFileName = '', sRawText = '', cDelim=''):
+        self._map = self._initMap(sFileName, sRawText, cDelim)
         self._iXLength = self._initXLength()
         self._iYLength = self._initYLength()
 
-    def _initMap(self, sFileName):
-        with open(sFileName, 'r') as file:
-            return [line for line in file.read().split('\n')]
+    def _initMap(self, sFileName, sRawText='', cDelim=''):
+        if len(sRawText) == 0 and len(sFileName) == 0:
+            raise Exception("Map2D.py:_initMap:Must specify filename or raw text input")
+        elif len(sRawText) == 0:
+            with open(sFileName, 'r') as file:
+                return self._parseRawText(file.read(), cDelim)
+        return self._parseRawText(sRawText, cDelim)
+            
+    def _parseRawText(self, sRawText, cDelim):
+        if len(cDelim) > 0:
+            return [line.split(cDelim) for line in sRawText.split('\n')]
+        else:
+            return [line for line in sRawText.split('\n')]
         
     def _initXLength(self):
         return len(self._map[0])
@@ -24,10 +34,21 @@ class Map2D:
     def get(self, iRowIndex: int, iColIndex: int):
         if self.isCoordValid(iRowIndex, iColIndex):
             return self._map[iRowIndex][iColIndex]
+        
+    def getRow(self, iRowIndex: int):
+        return self._map[iRowIndex]
     
     def isCoordValid(self, iRowIndex: int, iColIndex: int):
         return 0 <= iRowIndex and iRowIndex < self._iYLength\
             and 0 <= iColIndex and iColIndex < self._iXLength
+    
+    def Transpose(self):
+        self._map =  [[int(self._map[iRowNum][iColNum])\
+                         for iRowNum in range(self._iYLength)]\
+                        for iColNum in range(self._iXLength)]
+        tmp = self._iXLength
+        self._iXLength = self._iYLength
+        self._iYLength = tmp
         
     def iterateRows(self):
         for line in self._map:
