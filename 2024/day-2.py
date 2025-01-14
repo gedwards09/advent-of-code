@@ -1,9 +1,9 @@
 import sys
 from utils.AocController import AocController
-from utils.Int2DArray import Int2DArray
+from utils.IntMap2D import IntMap2D
 
 def Alg1(sFileName):
-    arr = Int2DArray(sFileName)
+    arr = IntMap2D(sFileName)
     s = 0
     for iRowNum in range(arr.getYLength()):
         row = arr.getRow(iRowNum)
@@ -30,7 +30,7 @@ def isRowSafe(row):
     return True
 
 def Alg2(sFileName):
-    arr = Int2DArray(sFileName)
+    arr = IntMap2D(sFileName)
     s = 0
     for iRowNum in range(arr.getYLength()):
         row = arr.getRow(iRowNum)

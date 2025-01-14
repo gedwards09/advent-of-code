@@ -1,9 +1,9 @@
 import sys
 from utils.AocController import AocController
-from utils.Int2DArray import Int2DArray
+from utils.IntMap2D import IntMap2D
 
 def Alg1(sFileName):
-    arr = Int2DArray(sFileName)
+    arr = IntMap2D(sFileName)
     arr.Transpose()
     arr.getRow(0).sort()
     arr.getRow(1).sort()
@@ -18,7 +18,7 @@ def getDistance(arr1, arr2):
     return dist
 
 def Alg2(sFileName):
-    arr = Int2DArray(sFileName)
+    arr = IntMap2D(sFileName)
     dic = {}
     colNum = 1
     for rowNum in range(arr.getYLength()):
