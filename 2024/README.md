@@ -19,7 +19,9 @@ where:
     TESTNUMBER is the test number being run.
 
 `aoc-run.py` is a helper script which calls the solution for a given puzzle number and part number using arguments passed via the command line:
-```python3 ./aoc-run.py DAYNUMBER [--part=PARTNUMBER]```
+```
+python3 ./aoc-run.py DAYNUMBER [--part=PARTNUMBER]
+```
 The algorithm result is printed through standard I/O.
 
 `run-tests.py` is a script which runs the solution script for each day against each of its test cases.
