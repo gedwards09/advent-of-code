@@ -1,7 +1,13 @@
 2024/inputs/1.txt
 2024/utils/__pycache__/AocArgs.cpython-312.pyc
-2024/TEMPLATE.py
 2024/utils/__pycache__/AocTester.cpython-312.pyc
-2024/tests/1-1.out
-2024/tests/1-2.out
-2024/tests/1.in
+.gitignore
+2024/utils/__pycache__/AocController.cpython-312.pyc
+2024/utils/__pycache__/Int2DArray.cpython-312.pyc
+2024/.vscode/launch.json
+2024/utils/__pycache__/Map2D.cpython-312.pyc
+2024/utils/__pycache__/IList.cpython-312.pyc
+2024/utils/__pycache__/List.cpython-312.pyc
+2024/utils/__pycache__/IntMap2D.cpython-312.pyc
+2024/utils/__pycache__/IndexedMap2D.cpython-312.pyc
+2024/utils/__pycache__/IndexedList.cpython-312.pyc
