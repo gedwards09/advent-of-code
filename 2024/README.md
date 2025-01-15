@@ -12,11 +12,11 @@ python3 ./day-DAYNUMBER.py PARTNUMBER [-t [-a TESTNUMBER]]
 ```
 where:
 
-    `DAYNUMBER=(1[0-9]|2[0-5]|[0-9])` is the puzzle number from 1 to 25
+    DAYNUMBER=(1[0-9]|2[0-5]|[0-9]) is the puzzle number from 1 to 25
 
-    `PARTNUMBER=(1|2)` is the part number being run
+    PARTNUMBER=(1|2) is the part number being run
 
-    `TESTNUMBER` is the test number being run.
+    TESTNUMBER is the test number being run.
 
 `aoc-run.py` is a helper script which calls the solution for a given puzzle number and part number using arguments passed via the command line:
 ```python3 ./aoc-run.py DAYNUMBER [--part=PARTNUMBER]```
