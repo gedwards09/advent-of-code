@@ -188,6 +188,6 @@ class AocArgs:
     # static
     def makeOutputFileName(sDayNumber: str, sPartNumber: str, sTestNumber: str) -> str:
         return AocArgs.g_sTestsDirectoryName + sDayNumber\
-            + AocArgs.g_sFileNameDelim + sPartNumber\
             + AocArgs.g_sFileNameDelim + sTestNumber\
+            + AocArgs.g_sFileNameDelim + sPartNumber\
             + AocArgs.g_sOutputFilePostfix
