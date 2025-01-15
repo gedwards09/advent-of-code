@@ -24,7 +24,10 @@ class AocController:
         if self._args.isVerbose():
             print(value)
         else:
-            assert(value == self._args.getOutput())
+            try:
+                assert(value == self._args.getOutput())
+            except AssertionError:
+                exit(1)
             print(self._getPassMessage(tTime))
 
     def _getPassMessage(self, tTime):

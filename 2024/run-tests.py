@@ -6,8 +6,8 @@ def _runAndCheck(iDayNumber):
     iTestNumber = 1
     while True:
         bDoContinue = False
-        for iPartNumber in range(2):
-            sPartNumber = str(iPartNumber + 1)
+        for iPartNumber in range(1,3):
+            sPartNumber = str(iPartNumber)
             sTestNumber = str(iTestNumber)
             sScriptFileName = AocArgs.makeScriptFileName(sDayNumber)
             sOutputFileName = AocArgs.makeOutputFileName(sDayNumber, sPartNumber, sTestNumber)
@@ -15,9 +15,15 @@ def _runAndCheck(iDayNumber):
                 bDoContinue = True
                 sCommand = _makeTesterCommand(sScriptFileName, sPartNumber, sTestNumber)
                 rc = os.system(sCommand)
+                if rc != 0:
+                    print("Day {:d}, Test {:d}, Part {:d} failed: {:d}-{:d}.in incorrect"\
+                        .format(iDayNumber, iTestNumber, iPartNumber,iDayNumber, iTestNumber))
+                    print("Expected results: {:d}-{:d}-{:d}.out".format(iDayNumber, iTestNumber, iPartNumber))
+                    return 1
         if not bDoContinue:
             break
         iTestNumber += 1
+    return 0
 
 def _makeTesterCommand(sScriptFileName, sPartNumber, sTestNumber):
     return ' '.join(['python3', sScriptFileName, sPartNumber, AocArgs.getTestFlag(), AocArgs.getAltFlag(), sTestNumber])
@@ -25,7 +31,9 @@ def _makeTesterCommand(sScriptFileName, sPartNumber, sTestNumber):
 def __main__():
     iTestNumber = 1
     while iTestNumber <= 25:
-        _runAndCheck(iTestNumber)
+        rc = _runAndCheck(iTestNumber)
+        if rc != 0:
+            return
         iTestNumber += 1
     return
 
