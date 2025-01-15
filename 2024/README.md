@@ -6,7 +6,7 @@
 
 `AocArgs.py` is helper class used by AocController responsible for parsing the command line arguments and determining each of: the input file containing the puzzle text, the day-number being tested, the part-number being solved, the test-number being run, whether the output is being tested against a known solution, and, if so, the output file to compare the result against.
 
-The solution for each day is contained in the script day-DAYNUMBER.py which can be invoked from the command line by:
+The solution for each day is contained in the script `day-DAYNUMBER.py` which can be invoked from the command line by:
 ```
 python3 ./day-DAYNUMBER.py PARTNUMBER [-t [-a TESTNUMBER]]
 ```
@@ -26,4 +26,4 @@ The algorithm result is printed through standard I/O.
 
 `run-tests.py` is a script which runs the solution script for each day against each of its test cases.
 
-The test files are stored in the `/tests/` directory. I have only included the example inputs and solutions given in the problem statement of each day as test files, as sharing puzzle inputs or answer keys is considered to be against the terms of Advent of Code. New test cases can added by including aditional files with the naming convention: `DAYNUMBER-TESTNUMBER.in` with solution files `DAYNUMBER-TESTNUMBER-PARTNUMBER.out`. In some cases (e.g. Day 3), different example inputs are used in the statement of Parts 1 and 2. In these cases I have only included the output file for the relevant Part in the set of output files.
+The test files are stored in the `tests` directory. I have only included the example inputs and solutions given in the problem statement of each day as test files, as sharing puzzle inputs or answer keys is considered to be against the terms of Advent of Code. New test cases can be added by including additional files with the naming convention: `DAYNUMBER-TESTNUMBER.in` for puzzle inputs and `DAYNUMBER-TESTNUMBER-PARTNUMBER.out` for solution outputs. In some cases (e.g. Day 3), different example inputs are used in the statement of Parts 1 and 2. In these cases I have only included the output file for the relevant Part in the set of output files.
