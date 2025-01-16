@@ -1,4 +1,4 @@
-from utils.List import List
+from utils.List.List import List
 
 class IndexedList(List):
 

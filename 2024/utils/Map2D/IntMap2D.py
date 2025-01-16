@@ -1,4 +1,4 @@
-from utils.Map2D import Map2D
+from utils.Map2D.Map2D import Map2D
 
 class IntMap2D(Map2D):
 

@@ -1,7 +1,7 @@
 import sys
 from utils.AocController import AocController
-from utils.IndexedList import IndexedList
-from utils.IndexedMap2D import IndexedMap2D
+from utils.List.IndexedList import IndexedList
+from utils.Map2D.IndexedMap2D import IndexedMap2D
 
 def Alg1(sFileName):
     pRulesIndex, psRawInputs = parseFile(sFileName)

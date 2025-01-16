@@ -1,6 +1,6 @@
 import sys
 from utils.AocController import AocController
-from utils.IntMap2D import IntMap2D
+from utils.Map2D.IntMap2D import IntMap2D
 
 def Alg1(sFileName):
     arr = IntMap2D(sFileName)

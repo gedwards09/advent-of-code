@@ -1,6 +1,6 @@
 import sys
 from utils.AocController import AocController
-from utils.Map2D import Map2D
+from utils.Map2D.Map2D import Map2D
 
 g_sSearchWord = 'XMAS'
 g_sSearchWord2 = 'MAS'

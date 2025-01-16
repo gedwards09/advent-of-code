@@ -1,4 +1,4 @@
-from utils.IList import IList
+from utils.List.IList import IList
 
 class List(IList):
 
