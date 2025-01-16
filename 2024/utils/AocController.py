@@ -31,7 +31,8 @@ class AocController:
             print(self._getPassMessage(tTime))
 
     def _getPassMessage(self, tTime):
-        return str(self._args.getPartNumber()) + ' Test '\
-            + self._args.getScriptFileName() + ' Part '\
-            + str(self._args.getTestNumber()) + ' Passed ({:.3f} s)'\
+        return self._args.getScriptFileName()\
+            + ' Test ' + str(self._args.getTestNumber())\
+            + ' Part ' + str(self._args.getPartNumber())\
+            + ' Passed ({:.3f} s)'\
             .format(tTime)
