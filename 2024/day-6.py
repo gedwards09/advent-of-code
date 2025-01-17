@@ -2,12 +2,12 @@ import sys
 from utils.AocController import AocController
 from utils.Map2D.Map2D import Map2D
 
-g_cDownSprite = 'v'
-g_cLeftSprite = '>'
+g_bDownFlag = 1 << 0
+g_bLeftFlag = 1 << 1
+g_bRightFlag = 1 << 2
+g_bUpFlag = 1 << 3
 g_cObstructionSprite = '#'
-g_cRightSprite = '<'
-g_cUpSprite = '^'
-g_cStartingSprite = g_cUpSprite
+g_cStartingSprite = '^'
 
 def Alg1(sFileName):
     pMap = Map2D(sFileName)
@@ -19,21 +19,42 @@ def getStartingCoordinate(pMap: Map2D):
     for iRow in range(pMap.getYLength()):
         for iCol in range(pMap.getXLength()):
             if pMap.get(iRow, iCol) == g_cStartingSprite:
-                return {'iRow': iRow, 'iCol': iCol, 'cDir': '^'}
+                return {'iRow': iRow, 'iCol': iCol, 'bDirFlag': g_bUpFlag}
+    # starting position not found
     return None
 
-def initVisited(pCoordinate):
-    return {(pCoordinate['iRow'], pCoordinate['iCol']): pCoordinate['cDir']}
-
-def traceSinglePath(pMap, pStartingCoordinate):
-    pCoordinate = copyCoordinate(pStartingCoordinate)
-    pVisited = initVisited(pCoordinate)
-    while pMap.isValid(pCoordinate['iRow'], pCoordinate['iCol']):
-        pCoordinate = advanceCoordinate(pMap, pCoordinate, pVisited)
+def traceSinglePath(pMap: Map2D, pStartingCoordinate):
+    pVisited = initVisited()
+    _ = _doesObstructedPathLoop(pMap, pStartingCoordinate, pVisited)
     return pVisited
+
+def initVisited():
+    return {}
+
+def _doesObstructedPathLoop(pMap: Map2D, pStartingCoordinate, pVisited, pObstruction=None):
+    pCoordinate = copyCoordinate(pStartingCoordinate)
+    while pMap.isValid(pCoordinate['iRow'], pCoordinate['iCol'])\
+            and not detectLoop(pVisited, pCoordinate):
+        pVisited = updateVisitedCoordinate(pVisited, pCoordinate)
+        pCoordinate = advanceCoordinate(pMap, pCoordinate, pVisited, pObstruction)
+    return detectLoop(pVisited, pCoordinate)
 
 def copyCoordinate(pCoordinate):
     return {key: pCoordinate[key] for key in pCoordinate}
+
+def detectLoop(pVisited, pCoordinate):
+    return (pCoordinate['iRow'], pCoordinate['iCol']) in pVisited\
+        and pVisited[(pCoordinate['iRow'], pCoordinate['iCol'])] & pCoordinate['bDirFlag'] != 0
+
+def updateVisitedCoordinate(pVisited, pCoordinate):
+    return updateVisited(pVisited, pCoordinate['iRow'], pCoordinate['iCol'], pCoordinate['bDirFlag'])
+
+def updateVisited(pVisited, iRow, iCol, bDirFlag):
+    if (iRow, iCol) not in pVisited:
+        pVisited[(iRow, iCol)] = bDirFlag
+    else:
+        pVisited[(iRow, iCol)] |= bDirFlag
+    return pVisited
             
 # advance position in a straight line until we hit an obstacle or leave the map
 def advanceCoordinate(map: Map2D, pCoordinate, pVisited, pObstruction=None):
@@ -41,16 +62,16 @@ def advanceCoordinate(map: Map2D, pCoordinate, pVisited, pObstruction=None):
         pObstruction = {'iRow': None, 'iCol': None}
     iRow = pCoordinate['iRow']
     iCol = pCoordinate['iCol']
-    iRowChange, iColChange = getCoordinateChange(pCoordinate['cDir'])
+    iRowChange, iColChange = getCoordinateChange(pCoordinate['bDirFlag'])
     while map.isValid(iRow + iRowChange,\
                       iCol + iColChange)\
         and map.get(iRow + iRowChange,\
                     iCol + iColChange) != g_cObstructionSprite\
         and not (iRow + iRowChange == pObstruction['iRow']\
-                 and iCol + iColChange == pObstruction['iCol']):
+                and iCol + iColChange == pObstruction['iCol']):
         iRow += iRowChange
         iCol += iColChange
-        pVisited = updateVisited(pVisited, iRow, iCol, pCoordinate['cDir'])
+        pVisited = updateVisited(pVisited, iRow, iCol, pCoordinate['bDirFlag'])
     if not map.isValid(iRow + iRowChange,
                        iCol + iColChange):
         # we're done
@@ -59,42 +80,35 @@ def advanceCoordinate(map: Map2D, pCoordinate, pVisited, pObstruction=None):
         iRow += iRowChange
         iCol += iColChange
     else:
-        pCoordinate['cDir'] = getNextDirection(pCoordinate['cDir'])
+        pCoordinate['bDirFlag'] = getNextDirection(pCoordinate['bDirFlag'])
     pCoordinate['iRow'] = iRow
     pCoordinate['iCol'] = iCol
     return pCoordinate
 
-def getCoordinateChange(cDirection: str):
+def getCoordinateChange(bDirFlag: int):
     iRow = 0
     iCol = 0
-    if cDirection == g_cDownSprite:
+    if bDirFlag == g_bDownFlag:
         iRow = 1
-    elif cDirection == g_cLeftSprite:
+    elif bDirFlag == g_bLeftFlag:
         iCol = -1
-    elif cDirection == g_cRightSprite:
+    elif bDirFlag == g_bRightFlag:
         iCol = 1
-    elif cDirection == g_cUpSprite:
+    elif bDirFlag == g_bUpFlag:
         iRow = -1
     return iRow, iCol
 
-def updateVisited(pVisited, iRow, iCol, cDir):
-    if (iRow, iCol) not in pVisited:
-        pVisited[(iRow, iCol)] = cDir
+def getNextDirection(bDirFlag: int):
+    if bDirFlag == g_bDownFlag:
+        return g_bLeftFlag
+    elif bDirFlag == g_bLeftFlag:
+        return g_bUpFlag
+    elif bDirFlag == g_bRightFlag:
+        return g_bDownFlag
+    elif bDirFlag == g_bUpFlag:
+        return g_bRightFlag
     else:
-        pVisited[(iRow, iCol)] += cDir
-    return pVisited
-
-def getNextDirection(cDirection: str):
-    if cDirection == g_cDownSprite:
-        return g_cLeftSprite
-    elif cDirection == g_cLeftSprite:
-        return g_cUpSprite
-    elif cDirection == g_cRightSprite:
-        return g_cDownSprite
-    elif cDirection == g_cUpSprite:
-        return g_cRightSprite
-    else:
-        return cDirection
+        return bDirFlag
 
 def getVisitedPositionCount(pVisited):
     iSum = 0
@@ -106,30 +120,18 @@ def Alg2(sFileName):
     pMap = Map2D(sFileName)
     pStartingCoordinate = getStartingCoordinate(pMap)
     pVisited = traceSinglePath(pMap, pStartingCoordinate)
+    pObstruction = {}
     iCount = 0
     for key in pVisited:
-        pObstruction = {'iRow': key[0], 'iCol': key[1]}
-        if doesPathLoopWithObstruction(pMap, pStartingCoordinate, pObstruction):
+        pObstruction['iRow'] = key[0]
+        pObstruction['iCol'] = key[1]
+        if doesObstructedPathLoop(pMap, pStartingCoordinate, pObstruction):
             iCount += 1
     return iCount
 
-def doesPathLoopWithObstruction(pMap, pStartingCoordinate, pObstruction):
-    pCoordinate = copyCoordinate(pStartingCoordinate)
-    pVisited = initVisited(pCoordinate)
-    while pMap.isValid(pCoordinate['iRow'], pCoordinate['iCol'])\
-        and not detectLoop(pCoordinate, pVisited):
-        pCoordinate = advanceCoordinate(pMap, pCoordinate, pVisited, pObstruction=pObstruction)
-    # we detected a loop if and only if current coordinate is valid
-    return pMap.isValid(pCoordinate['iRow'], pCoordinate['iCol'])
-
-def detectLoop(pCoordinate, pVisited):
-    s = pVisited[(pCoordinate['iRow'], pCoordinate['iCol'])]
-    dir = {}
-    for c in s:
-        if c in dir:
-            return True
-        dir[c] = ''
-    return False
+def doesObstructedPathLoop(pMap: Map2D, pStartingCoordinate, pObstruction):
+    pVisited = initVisited()
+    return _doesObstructedPathLoop(pMap, pStartingCoordinate, pVisited, pObstruction)
 
 def __main__():
     c = AocController(sys.argv, Alg1, Alg2)
