@@ -36,17 +36,17 @@ class XPosition:
 
 def Alg1(sFileName):
     pMap = Map2D(sFileName)
-    return doAlg1(pMap)
+    return doAlg(pMap, pathCounterBFS)
 
-def doAlg1(pMap: Map2D):
+def doAlg(pMap: Map2D, fpPathCounter):
     iSum = 0
     for iRow in range(pMap.getYLength()):
         for iCol in range(pMap.getXLength()):
             if pMap.get(iRow, iCol) == '0':
-                iSum += getPathCount(pMap, iRow, iCol)
+                iSum += fpPathCounter(pMap, iRow, iCol)
     return iSum
 
-def getPathCount(pMap: Map2D, iRow: int, iCol: int):
+def pathCounterBFS(pMap: Map2D, iRow: int, iCol: int):
     iPathCount = 0
     pPosition = XPosition(iRow, iCol, '0')
     pVisited = {pPosition.tuple():''}
@@ -73,7 +73,24 @@ def iterateNextPositions(pMap: Map2D, pVisited: dict, pPosition: XPosition):
 
 
 def Alg2(sFileName):
-    return
+    pMap = Map2D(sFileName)
+    return doAlg(pMap, pathCounterDistinct)
+
+# same algorithm as BFS but we don't mark a cell as visitied until we have added 
+# all its neighbors to the queue
+def pathCounterDistinct(pMap: Map2D, iRow: int, iCol: int):
+    iPathCount = 0
+    pPosition = XPosition(iRow, iCol, '0')
+    pVisited = {pPosition.tuple():''}
+    pQueue = [pPosition]
+    while len(pQueue) > 0:
+        pCurrentPosition = pQueue.pop(0)
+        if pCurrentPosition.getDigit() == 9:
+            iPathCount += 1
+        for pNextPosition in iterateNextPositions(pMap, {}, pCurrentPosition):
+            pQueue.append(pNextPosition)
+        pVisited[pNextPosition.tuple()] = ''
+    return iPathCount
 
 def __main__():
     c = AocController(sys.argv, Alg1, Alg2)
