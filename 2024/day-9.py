@@ -1,7 +1,6 @@
 import sys
 from utils.AocController import AocController
-from utils.Comparable.IComparable import IComparable
-from utils.LinkedList.OrderedLinkedList import OrderedLinkedList
+from utils.LinkedList.LinkedList import LinkedList
 
 class XDiskDefragmenter:
 
@@ -14,12 +13,6 @@ class XDiskDefragmenter:
 
     def GetIncrementSumFactor(iStart, iSize):
         return iSize * (iSize + 2 * iStart - 1) // 2
-    
-def Alg1(sFileName):
-    with open(sFileName, 'r') as file:
-        d = XDiskBlockDefragmenter(file.read())
-    return d.ComputeChecksum()
-
 
 class XDiskBlockDefragmenter(XDiskDefragmenter):
 
@@ -75,11 +68,6 @@ class XDiskBlockDefragmenter(XDiskDefragmenter):
         self._iRightDigit = int(self._sDiskMap[self._iRightIdx])
         self._iRightId -= 1
 
-def Alg2(sFileName):
-    with open(sFileName, 'r') as file:
-        d = XDiskFileDefragmenter(file.read())
-    return d.ComputeChecksum()
-
 class XDiskFileDefragmenter(XDiskDefragmenter):
 
     def __init__(self, sDiskMap):
@@ -87,7 +75,7 @@ class XDiskFileDefragmenter(XDiskDefragmenter):
         self._pList = self._initList(sDiskMap)
 
     def _initList(self, sDiskMap):
-        pList = XBlockList()
+        pList = LinkedList()
         iStart = 0
         for idx in range(len(sDiskMap)):
             cDigit = sDiskMap[idx]
@@ -124,7 +112,6 @@ class XDiskFileDefragmenter(XDiskDefragmenter):
             iFactor = self._allocateBlockAndGetFactor(pBlock, iSize)
             if pBlock.getSize() == 0:
                 _ = self._pList.removeFromFront()
-            self._free(iStart, iSize, pStartNode=None)
         elif pBlock.getStart() <= iStart:
             while pNode.getNext() != None:
                 pBlock = pNode.getNext().getData()
@@ -132,23 +119,18 @@ class XDiskFileDefragmenter(XDiskDefragmenter):
                     iFactor = self._allocateBlockAndGetFactor(pBlock, iSize)
                     if pBlock.getSize() == 0:
                         pNode.setNext(pNode.getNext().getNext())
-                    self._free(iStart, iSize, pStartNode=pNode)
                     break
                 elif pBlock.getStart() > iStart:
                     break
                 pNode = pNode.getNext()
         return iFactor
     
-    def _free(self, iStart, iSize, pStartNode=None):
-        pBlock = XBlockRange(iStart, iSize)
-        self._pList.insert(pBlock, pStartNode)
-    
     def _allocateBlockAndGetFactor(self, pBlock, iSize):
         iFactor = XDiskDefragmenter.GetIncrementSumFactor(pBlock.getStart(), iSize)
         pBlock.AllocateBlock(iSize)
         return iFactor
 
-class XBlockRange(IComparable):
+class XBlockRange:
 
     def __init__(self, iStart, iSize):
         self._iStart = iStart
@@ -159,42 +141,22 @@ class XBlockRange(IComparable):
 
     def getSize(self):
         return self._iSize
-    
-    # Override
-    def Compare(self, pOther):
-        if not isinstance(pOther, XBlockRange):
-            raise Exception('XBlockRange:Compare:Cannot compare object to XBlockRange')
-        return self._iStart - pOther.getStart()
 
     def AllocateBlock(self, iSize):
         if iSize > self._iSize:
             raise Exception('XBlockRange:AllocateBlock:Attempted to allocate block larger than avaialable in range')
         self._iStart += iSize
         self._iSize -= iSize
+    
+def Alg1(sFileName):
+    with open(sFileName, 'r') as file:
+        d = XDiskBlockDefragmenter(file.read())
+    return d.ComputeChecksum()
 
-    def AppendToBack(self, iSize):
-        self._iSize += iSize
-
-class XBlockList(OrderedLinkedList):
-
-    # Override
-    def _putAfter(self, pCurrentNode, pNewNode):
-        super()._putAfter(pCurrentNode, pNewNode)
-        self._defragAt(pCurrentNode)
-
-    def _defragAt(self, pCurrentNode):
-        if pCurrentNode == None or pCurrentNode.getNext() == None:
-            return
-        if pCurrentNode.getNext().getNext() != None:
-            self._defrag(pCurrentNode.getNext())
-        self._defrag(pCurrentNode)
-
-    def _defrag(self, pCurrentNode):
-        pCurrentBlock = pCurrentNode.getData()
-        pNextBlock = pCurrentNode.getNext().getData()
-        if pCurrentBlock.getStart() + pCurrentBlock.getSize() == pNextBlock.getStart():
-            pCurrentBlock.AppendToBack(pNextBlock.getSize())
-            pCurrentNode.setNext(pCurrentNode.getNext().getNext())
+def Alg2(sFileName):
+    with open(sFileName, 'r') as file:
+        d = XDiskFileDefragmenter(file.read())
+    return d.ComputeChecksum()
 
 def __main__():
     c = AocController(sys.argv, Alg1, Alg2)

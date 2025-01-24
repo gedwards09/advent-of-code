@@ -10,10 +10,6 @@ class LinkedList:
     def getHead(self):
         return self._pHead
     
-    # protected
-    def _setHead(self, pNode):
-        self._pHead = pNode
-    
     def size(self):
         return self._iSz
     
@@ -31,10 +27,6 @@ class LinkedList:
 
     def addToBack(self, vData):
         pNode = self._makeNode(vData)
-        self._addNodeToBack(pNode)
-
-    # protected
-    def _addNodeToBack(self, pNode):
         if self._iSz == 0:
             self._pHead = pNode
             self._pTail = pNode
