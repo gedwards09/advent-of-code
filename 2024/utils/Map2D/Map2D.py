@@ -17,7 +17,7 @@ class Map2D:
         if len(cDelim) > 0:
             return [line.split(cDelim) for line in sRawText.split('\n')]
         else:
-            return [line for line in sRawText.split('\n')]
+            return sRawText.split('\n')
         
     def _initXLength(self):
         return len(self._map[0])
