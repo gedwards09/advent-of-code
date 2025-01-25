@@ -20,18 +20,6 @@ class XPosition:
 
     def tuple(self):
         return (self._iRow, self._iCol)
-    
-    def getAdjacentDigit(self, pMap: Map2D, iRowStep, iColStep):
-        cDigit = pMap.get(self._iRow + iRowStep, self._iCol + iColStep)
-        if cDigit != None:
-            return int(cDigit)
-        return None
-    
-    def getAdjacentTuple(self, iRowStep, iColStep):
-        return (self._iRow + iRowStep, self._iCol + iColStep)
-    
-    def makeAdjacentPosition(self, iRowStep, iColStep, iNextDigit):
-        return XPosition(self._iRow + iRowStep, self._iCol + iColStep, iNextDigit)
 
 
 def Alg1(sFileName):
@@ -62,15 +50,9 @@ def pathCounterBFS(pMap: Map2D, iRow: int, iCol: int):
 
 def iterateNextPositions(pMap: Map2D, pVisited: dict, pPosition: XPosition):
     iNextDigit = pPosition.getDigit() + 1
-    for iStep in [-1, 1]:
-        if pPosition.getAdjacentDigit(pMap, iStep, 0) == iNextDigit\
-            and pPosition.getAdjacentTuple(iStep, 0) not in pVisited:
-            yield pPosition.makeAdjacentPosition(iStep, 0, iNextDigit)
-
-        if pPosition.getAdjacentDigit(pMap, 0, iStep) == iNextDigit\
-            and pPosition.getAdjacentTuple(0, iStep) not in pVisited:
-            yield pPosition.makeAdjacentPosition(0, iStep, iNextDigit)
-
+    for iRow, iCol, cDigit in pMap.iterateNeighbors(pPosition.getRow(), pPosition.getCol()):
+        if int(cDigit) == iNextDigit and (iRow, iCol) not in pVisited:
+            yield XPosition(iRow, iCol, cDigit)
 
 def Alg2(sFileName):
     pMap = Map2D(sFileName)
