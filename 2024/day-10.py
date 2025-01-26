@@ -21,7 +21,6 @@ class XPosition:
     def tuple(self):
         return (self._iRow, self._iCol)
 
-
 def Alg1(sFileName):
     pMap = Map2D(sFileName)
     return doAlg(pMap, pathCounterBFS)

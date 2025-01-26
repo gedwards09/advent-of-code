@@ -43,10 +43,10 @@ class XRegionIndex(object):
         self._pUnionFind = UnionFind()
 
     def addNewArea(self, sName, iRow, iCol):
-        parentKey = self.__getOrCreateRegionParentKey(sName, iRow, iCol)
+        parentKey = self._getOrCreateRegionParentKey(sName, iRow, iCol)
         self._pIndex[sName][parentKey].incrementArea()
 
-    def __getOrCreateRegionParentKey(self, sName, iRow, iCol):
+    def _getOrCreateRegionParentKey(self, sName, iRow, iCol):
         if sName == None:
             return
         if not self._pUnionFind.Exists((iRow, iCol)):
@@ -65,7 +65,7 @@ class XRegionIndex(object):
         return XRegion(sName)
 
     def addPerimeter(self, sName, iRow, iCol):
-        parentKey = self.__getOrCreateRegionParentKey(sName, iRow, iCol)
+        parentKey = self._getOrCreateRegionParentKey(sName, iRow, iCol)
         self._pIndex[sName][parentKey].incrementPerimeter()
 
     def addFence(self, sName, iRow, iCol, sNeighborName, iNeighborRow, iNeighborCol):
@@ -248,14 +248,14 @@ class XDiscountRegionIndex(XRegionIndex):
         return XDiscountRegion(sName)
 
     def addFence(self, sName, iRow, iCol, sNeighborName, iNeighborRow, iNeighborCol):
-        super(XDiscountRegionIndex, self).addFence(sName, iRow, iCol, sNeighborName, iNeighborRow, iNeighborCol)
+        super().addFence(sName, iRow, iCol, sNeighborName, iNeighborRow, iNeighborCol)
         if sName != None:
             self.addSide(sName, iRow, iCol, iNeighborRow - iRow, iNeighborCol - iCol)
         if sNeighborName != None:
             self.addSide(sNeighborName, iNeighborRow, iNeighborCol, iRow - iNeighborRow, iCol - iNeighborCol)
     
     def addSide(self, sName, iRow, iCol, iRowDiff, iColDiff):
-        parentKey = XDiscountRegionIndex._XRegionIndex__getOrCreateRegionParentKey(self, sName, iRow, iCol)
+        parentKey = self._getOrCreateRegionParentKey(sName, iRow, iCol)
         self._pIndex[sName][parentKey].addSide(iRow, iCol, iRowDiff, iColDiff)
 
 def Alg2(sFileName):
