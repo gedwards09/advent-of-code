@@ -34,9 +34,14 @@ class Map2D:
     def get(self, iRowIndex: int, iColIndex: int):
         if self.isValid(iRowIndex, iColIndex):
             return self._map[iRowIndex][iColIndex]
+        else:
+            return None
         
     def getRow(self, iRowIndex: int):
-        return self._map[iRowIndex]
+        if 0 <= iRowIndex and iRowIndex < self.getYLength():
+            return self._map[iRowIndex]
+        else:
+            return None
     
     def isValid(self, iRowIndex: int, iColIndex: int):
         return 0 <= iRowIndex and iRowIndex < self._iYLength\
