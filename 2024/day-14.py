@@ -43,13 +43,19 @@ class XFloorSpace:
         self._iXLength = pBounds[0]
         self._iYLength = pBounds[1]
         self._pRobots = self.__initRobots(pLines[1:])
-        self._pPositions = self.__getRobotPositions()
+        self._pPositions = self.__initPositions()
 
     def __initBounds(self, sLine):
         return [int(s) for s in sLine.split(',')]
 
     def __initRobots(self, pLines):
         return [XRobot(sLine) for sLine in pLines]
+    
+    def __initPositions(self):
+        pPositions = {}
+        for pRobot in self._pRobots:
+            pPositions[pRobot.getPosition()] = ''
+        return pPositions
     
     def Reset(self):
         for pRobot in self._pRobots:
@@ -58,26 +64,15 @@ class XFloorSpace:
     def AdvanceRobots(self, iSteps=None):
         if iSteps == None:
             iSteps = XFloorSpace.__getNumberOfSteps()
+        pPositions = {}
         for pRobot in self._pRobots:
             pRobot.Advance(iSteps, iXBound = self._iXLength, iYBound = self._iYLength)
-        self.__updateRobotPositions()
+            pPositions[pRobot.getPosition()] = ''
+        self._pPositions = pPositions
 
     def __getNumberOfSteps():
         return XFloorSpace.g_iNumberOfSteps
     
-    def __updateRobotPositions(self):
-        self._pPositions = self.__getRobotPositions()
-
-    def __getRobotPositions(self):
-        pPositions = {}
-        for pRobot in self._pRobots:
-            tCoord = pRobot.getPosition()
-            if tCoord not in pPositions:
-                pPositions[tCoord] = 1
-            else:
-                pPositions[tCoord] += 1
-        return pPositions
-
     def GetRobotQuadrantCountProduct(self):
         iProduct = 1
         for iCount in self.__getRobotQuadrantCount():
@@ -104,9 +99,8 @@ class XFloorSpace:
         return 1 * (2 * tCoord[0]  > self._iXLength) + 2 * (2 * tCoord[1] > self._iYLength)
     
     def Print(self):
-        pPositions = self.__getRobotPositions()
         for iRow in range(self._iYLength):
-            s = ''.join(['#' if (iCol, iRow) in pPositions else ' ' for iCol in range(self._iXLength)])
+            s = ''.join(['#' if (iCol, iRow) in self._pPositions else ' ' for iCol in range(self._iXLength)])
             print(s)
 
     def GetMaxConnectivityStepNumber(self, bPrint=False):
