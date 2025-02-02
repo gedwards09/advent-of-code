@@ -13,7 +13,7 @@ class Map2D:
                 return self._parseRawText(file.read(), cDelim)
         return self._parseRawText(sRawText, cDelim)
             
-    def _parseRawText(self, sRawText, cDelim):
+    def _parseRawText(self, sRawText, cDelim=''):
         if len(cDelim) > 0:
             return [line.split(cDelim) for line in sRawText.split('\n')]
         else:
@@ -36,6 +36,9 @@ class Map2D:
             return self._map[iRowIndex][iColIndex]
         else:
             return None
+        
+    def _getMap(self):
+        return self._map
         
     def getRow(self, iRowIndex: int):
         if 0 <= iRowIndex and iRowIndex < self.getYLength():
