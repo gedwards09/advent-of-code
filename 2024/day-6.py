@@ -1,66 +1,36 @@
 import sys
 from utils.AocController import AocController
 from utils.Map2D.Map2D import Map2D
+from utils.VisitorCoordinate.VisitorCoordinate import VisitorCoordinate
 
 g_cObstructionSprite = '#'
 g_cStartingSprite = '^'
 
-class XCoordinate:
-
-    g_bDownFlag = 1 << 0
-    g_bLeftFlag = 1 << 1
-    g_bRightFlag = 1 << 2
-    g_bUpFlag = 1 << 3
-    g_cDownSprite = 'v'
-    g_cLeftSprite = '<'
-    g_cRightSprite = '>'
-    g_cUpSprite = '^'
+class XCoordinate(VisitorCoordinate):
 
     def __init__(self, iRow, iCol, cDirSprite=None):
-        self.Row = iRow
-        self.Col = iCol
+        super().__init__(iRow, iCol, cDirSprite)
         self.DirFlag = XCoordinate.initDirFlag(cDirSprite)
-        self._cDirSprite = cDirSprite
 
     def initDirFlag(cDirSprite):
-        if cDirSprite == XCoordinate.g_cDownSprite:
-            return XCoordinate.g_bDownFlag
-        elif cDirSprite == XCoordinate.g_cLeftSprite:
-            return XCoordinate.g_bLeftFlag
-        elif cDirSprite == XCoordinate.g_cRightSprite:
-            return XCoordinate.g_bRightFlag
-        elif cDirSprite == XCoordinate.g_cUpSprite:
-            return XCoordinate.g_bUpFlag
+        return VisitorCoordinate.GetDirFlag(cDirSprite)
 
     def copy(self):
-        return XCoordinate(self.Row, self.Col, self._cDirSprite)
-
-    def getCoordinateChange(self):
-        iRow = 0
-        iCol = 0
-        if self.DirFlag == XCoordinate.g_bDownFlag:
-            iRow = 1
-        elif self.DirFlag == XCoordinate.g_bLeftFlag:
-            iCol = -1
-        elif self.DirFlag == XCoordinate.g_bRightFlag:
-            iCol = 1
-        elif self.DirFlag == XCoordinate.g_bUpFlag:
-            iRow = -1
-        return iRow, iCol
+        return XCoordinate(self.getRow(), self.getCol(), self.getDir())
 
     def advanceDirection(self):
         self.DirFlag = self._getNextDirection()
 
     # private
     def _getNextDirection(self):
-        if self.DirFlag == XCoordinate.g_bDownFlag:
-            return XCoordinate.g_bLeftFlag
-        elif self.DirFlag == XCoordinate.g_bLeftFlag:
-            return XCoordinate.g_bUpFlag
-        elif self.DirFlag == XCoordinate.g_bRightFlag:
-            return XCoordinate.g_bDownFlag
-        elif self.DirFlag == XCoordinate.g_bUpFlag:
-            return XCoordinate.g_bRightFlag
+        if self.DirFlag == VisitorCoordinate.GetDownFlag():
+            return VisitorCoordinate.GetLeftFlag()
+        elif self.DirFlag == VisitorCoordinate.GetLeftFlag():
+            return VisitorCoordinate.GetUpFlag()
+        elif self.DirFlag == VisitorCoordinate.GetRightFlag():
+            return VisitorCoordinate.GetDownFlag()
+        elif self.DirFlag == VisitorCoordinate.GetUpFlag():
+            return VisitorCoordinate.GetRightFlag()
         else:
             return self.DirFlag
 
@@ -84,41 +54,41 @@ def traceSinglePath(pMap: Map2D, pStartingCoordinate):
     return pVisited
 
 def initVisited(pCoordinate):
-    return {(pCoordinate.Row, pCoordinate.Col): ''}
+    return {(pCoordinate.getRow(), pCoordinate.getCol()): ''}
 
 def _doesObstructedPathLoop(pMap: Map2D, pStartingCoordinate, pVisited=None, pObstruction=None):
     pCoordinate = pStartingCoordinate.copy()
     pLoopChecker = {}
-    while pMap.isValid(pCoordinate.Row, pCoordinate.Col)\
+    while pMap.isValid(pCoordinate.getRow(), pCoordinate.getCol())\
             and not detectLoop(pLoopChecker, pCoordinate):
         pLoopChecker = updateLoopChecker(pLoopChecker, pCoordinate)
         pCoordinate = advanceCoordinate(pMap, pCoordinate, pVisited, pObstruction)
     return detectLoop(pLoopChecker, pCoordinate)
 
 def detectLoop(pLoopChecker, pCoordinate):
-    return (pCoordinate.Row, pCoordinate.Col) in pLoopChecker\
-        and pLoopChecker[(pCoordinate.Row, pCoordinate.Col)] & pCoordinate.DirFlag != 0
+    return (pCoordinate.getRow(), pCoordinate.getCol()) in pLoopChecker\
+        and pLoopChecker[(pCoordinate.getRow(), pCoordinate.getCol())] & pCoordinate.DirFlag != 0
 
 def updateLoopChecker(pLoopChecker, pCoordinate):
-    if (pCoordinate.Row, pCoordinate.Col) not in pLoopChecker:
-        pLoopChecker[(pCoordinate.Row, pCoordinate.Col)] = pCoordinate.DirFlag
+    if (pCoordinate.getRow(), pCoordinate.getCol()) not in pLoopChecker:
+        pLoopChecker[(pCoordinate.getRow(), pCoordinate.getCol())] = pCoordinate.DirFlag
     else:
-        pLoopChecker[(pCoordinate.Row, pCoordinate.Col)] |= pCoordinate.DirFlag
+        pLoopChecker[(pCoordinate.getRow(), pCoordinate.getCol())] |= pCoordinate.DirFlag
     return pLoopChecker
             
 # advance position in a straight line until we hit an obstacle or leave the map
 def advanceCoordinate(map: Map2D, pCoordinate, pVisited, pObstruction=None):
     if pObstruction == None:
         pObstruction = XCoordinate(iRow=None, iCol=None)
-    iRow = pCoordinate.Row
-    iCol = pCoordinate.Col
+    iRow = pCoordinate.getRow()
+    iCol = pCoordinate.getCol()
     iRowChange, iColChange = pCoordinate.getCoordinateChange()
     while map.isValid(iRow + iRowChange,\
                       iCol + iColChange)\
         and map.get(iRow + iRowChange,\
                     iCol + iColChange) != g_cObstructionSprite\
-        and not (iRow + iRowChange == pObstruction.Row\
-                and iCol + iColChange == pObstruction.Col):
+        and not (iRow + iRowChange == pObstruction.getRow()\
+                and iCol + iColChange == pObstruction.getCol()):
         iRow += iRowChange
         iCol += iColChange
         if pVisited != None:
@@ -132,8 +102,8 @@ def advanceCoordinate(map: Map2D, pCoordinate, pVisited, pObstruction=None):
         iCol += iColChange
     else:
         pCoordinate.advanceDirection()
-    pCoordinate.Row = iRow
-    pCoordinate.Col = iCol
+    pCoordinate.setRow(iRow)
+    pCoordinate.setCol(iCol)
     return pCoordinate
 
 def updateVisited(pVisited, iRow, iCol):
@@ -153,8 +123,8 @@ def Alg2(sFileName):
     pObstruction = XCoordinate(iRow=None, iCol=None)
     iCount = 0
     for key in pVisited:
-        pObstruction.Row = key[0]
-        pObstruction.Col = key[1]
+        pObstruction.setRow(key[0])
+        pObstruction.setCol(key[1])
         if doesObstructedPathLoop(pMap, pStartingCoordinate, pObstruction):
             iCount += 1
     return iCount
