@@ -25,7 +25,7 @@ class AocController:
             print(value)
         else:
             try:
-                assert(value == self._args.getOutput())
+                assert(str(value) == self._args.getOutput())
             except AssertionError:
                 exit(1)
             print(self._getPassMessage(tTime))

@@ -127,7 +127,7 @@ class AocArgs:
         sTestNumber = str(self._iTestNumber)
         sOutputFileName = AocArgs.makeOutputFileName(sDayNumber, sPartNumber, sTestNumber)
         with open(sOutputFileName, 'r') as file:
-            return int(file.read())
+            return file.read()
     
     # private
     # static
