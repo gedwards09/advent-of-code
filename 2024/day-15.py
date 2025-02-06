@@ -24,7 +24,6 @@ class XWarehouse(CharMap2D):
             for iCol in range(self.getXLength()):
                 c = sRow[iCol]
                 if c == XWarehouse.g_cRobotSprite:
-                    # self._set(iRow, iCol, '.')
                     return (iRow, iCol)
                 
     def Execute(self):

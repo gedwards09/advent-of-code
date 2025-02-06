@@ -14,7 +14,7 @@ class XMemMap(CharMap2D):
         iByteCount = int(pLines[0])
         iSzX, iSzY = XMemMap.__parseLine(pLines[1])
         sRawText = '\n'.join([''.join([XMemMap.g_cSafeSprite for _ in range(iSzX + 1)]) for __ in range(iSzY + 1)])
-        super().__init__(sRawText=sRawText, cDelim='\n')
+        super().__init__(sRawText=sRawText)
         self._iByteCount = iByteCount
         self._pBytes = [XMemMap.__parseLine(sLine) for sLine in pLines[2:]]
         self._iByteIndex = 0

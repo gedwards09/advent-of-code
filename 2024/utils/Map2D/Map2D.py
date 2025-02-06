@@ -1,11 +1,11 @@
 class Map2D:
 
-    def __init__(self, sFileName = '', sRawText = '', cDelim=''):
+    def __init__(self, sFileName = '', sRawText = '', cDelim=None):
         self._map = self._initMap(sFileName, sRawText, cDelim)
         self._iXLength = self._initXLength()
         self._iYLength = self._initYLength()
 
-    def _initMap(self, sFileName, sRawText='', cDelim=''):
+    def _initMap(self, sFileName, sRawText='', cDelim=None):
         if len(sRawText) == 0 and len(sFileName) == 0:
             raise Exception("Map2D.py:_initMap:Must specify filename or raw text input")
         elif len(sRawText) == 0:
@@ -13,8 +13,8 @@ class Map2D:
                 return self._parseRawText(file.read(), cDelim)
         return self._parseRawText(sRawText, cDelim)
             
-    def _parseRawText(self, sRawText, cDelim=''):
-        if len(cDelim) > 0:
+    def _parseRawText(self, sRawText, cDelim=None):
+        if cDelim != None:
             return [line.split(cDelim) for line in sRawText.split('\n')]
         else:
             return sRawText.split('\n')
