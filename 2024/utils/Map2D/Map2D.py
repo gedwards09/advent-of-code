@@ -89,9 +89,9 @@ class Map2D:
             iBound = min(iRowNum + 1, self._iXLength)
             yield ''.join([self._map[iRowNum - i][i] for i in range(iBound)])
 
-    def iterateNeighbors(self, iRow, iCol):
+    def iterateNeighbors(self, iRow, iCol, iStepSize=1):
         for iStep in [-1, 1]:
-            if self.isValid(iRow + iStep, iCol):
-                yield (iRow + iStep, iCol, self.get(iRow + iStep, iCol))
-            if self.isValid(iRow, iCol + iStep):
-                yield (iRow, iCol + iStep, self.get(iRow, iCol + iStep))
+            if self.isValid(iRow + iStepSize * iStep, iCol):
+                yield (iRow + iStepSize * iStep, iCol, self.get(iRow + iStepSize * iStep, iCol))
+            if self.isValid(iRow, iCol + iStepSize * iStep):
+                yield (iRow, iCol + iStepSize * iStep, self.get(iRow, iCol + iStepSize * iStep))

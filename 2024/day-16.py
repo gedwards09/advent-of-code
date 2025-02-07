@@ -1,6 +1,6 @@
 import sys
 from utils.AocController import AocController
-from utils.Map2D.Map2D import Map2D
+from utils.Map2D.MazeMap import MazeMap
 from utils.VisitorCoordinate.VisitorCoordinate import VisitorCoordinate
 
 
@@ -20,53 +20,16 @@ class XCoordinate(VisitorCoordinate):
             
             yield (self._iRow, self._iCol + iDiff, VisitorCoordinate.GetNeighborDirection(0, iDiff))
     
-class XMazeMap(Map2D):
-
-    g_cStartSprite = 'S'
-    g_cEndSprite = 'E'
-    g_cWallSprite = '#'
-
-    def __init__(self, sFileName):
-        super().__init__(sFileName=sFileName)
-        tStart, tEnd = self._initStartAndEndPositions()
-        self._tStart = tStart
-        self._tEnd = tEnd
-    
-    def _initStartAndEndPositions(self):
-        tStart = None
-        tEnd = None
-        for iRow in range(self.getYLength()):
-            sRow = self.getRow(iRow)
-            for iCol in range(self.getXLength()):
-                if sRow[iCol] == XMazeMap.g_cStartSprite:
-                    tStart = (iRow, iCol)
-                    if tEnd != None:
-                        return tStart, tEnd
-                elif sRow[iCol] == XMazeMap.g_cEndSprite:
-                    tEnd = (iRow, iCol)
-                    if tStart != None:
-                        return tStart, tEnd
-                    
-    def getStart(self):
-        return self._tStart
-    
-    def getEnd(self):
-        return self._tEnd
+class XReindeerMazeMap(MazeMap):
     
     def GetStartDirection():
         return XCoordinate.GetRightSprite()
-    
-    def GetWallSprite():
-        return XMazeMap.g_cWallSprite
-    
-    def GetEndSprite():
-        return XMazeMap.g_cEndSprite
 
 def Alg1(sFileName):
-    pMap = XMazeMap(sFileName)
+    pMap = XReindeerMazeMap(sFileName)
     return getLowestEndScore(pMap)
 
-def getLowestEndScore(pMap: XMazeMap, pLowestScores = None, pPredecessors = None):
+def getLowestEndScore(pMap: XReindeerMazeMap, pLowestScores = None, pPredecessors = None):
     if pLowestScores == None:
         pLowestScores = {}
     getLowestCoordinateScores(pMap, pLowestScores=pLowestScores, pPredecessors=pPredecessors)
@@ -81,11 +44,11 @@ def getLowestEndScore(pMap: XMazeMap, pLowestScores = None, pPredecessors = None
                 iMin = pLowestScores[tKey]
     return iMin
 
-def getLowestCoordinateScores(pMap: Map2D, pLowestScores = None, pPredecessors = None):
+def getLowestCoordinateScores(pMap: MazeMap, pLowestScores = None, pPredecessors = None):
     pCoord = buildStartingCoordinate(pMap)
     if pLowestScores == None:
         pLowestScores = {}
-    pLowestScores[(pCoord.getCoord(), XMazeMap.GetStartDirection())] = pCoord.getScore()
+    pLowestScores[(pCoord.getCoord(), XReindeerMazeMap.GetStartDirection())] = pCoord.getScore()
     pQueue = [pCoord]
     while len(pQueue) > 0:
         pCoord = pQueue.pop(0)
@@ -93,7 +56,7 @@ def getLowestCoordinateScores(pMap: Map2D, pLowestScores = None, pPredecessors =
             if not pMap.isValid(iRow, iCol):
                 continue
             cSprite = pMap.get(iRow, iCol)
-            if cSprite == XMazeMap.GetWallSprite():
+            if cSprite == XReindeerMazeMap.GetWallSprite():
                 continue
             tNextCoord = (iRow, iCol)
             iNextScore = pCoord.getScore() + 1
@@ -109,9 +72,9 @@ def getLowestCoordinateScores(pMap: Map2D, pLowestScores = None, pPredecessors =
             elif pPredecessors != None and iNextScore == pLowestScores[tNextKey]:
                     pPredecessors[tNextKey].append((pCoord.getCoord(), pCoord.getDir()))
 
-def buildStartingCoordinate(pMap: XMazeMap):
+def buildStartingCoordinate(pMap: XReindeerMazeMap):
     tStart = pMap.getStart()
-    return XCoordinate(iRow=tStart[0], iCol=tStart[1], cDir=XMazeMap.GetStartDirection(), iScore=0)
+    return XCoordinate(iRow=tStart[0], iCol=tStart[1], cDir=XReindeerMazeMap.GetStartDirection(), iScore=0)
 
 def newPredecessorList():
     return [None for _ in range(4)]
@@ -127,10 +90,10 @@ def getIndexFromDirection(cDirSprite):
         return 3
 
 def Alg2(sFileName):
-    pMap = XMazeMap(sFileName)
+    pMap = XReindeerMazeMap(sFileName)
     return getLowestEndScoreTileCount(pMap)
 
-def getLowestEndScoreTileCount(pMap: XMazeMap):
+def getLowestEndScoreTileCount(pMap: XReindeerMazeMap):
     pPredecessors = {}
     pLowestScores = {}
     iMin = getLowestEndScore(pMap, pLowestScores=pLowestScores, pPredecessors=pPredecessors)
