@@ -41,6 +41,9 @@ class XKeypadADT:
     def __fpDefaultPathMetric(sPath):
         return 0
     
+    def _getPosition(self, cSprite):
+        return self._pPositionIndex[cSprite]
+    
     def SetPathMetric(self, fpPathMetric):
         self._fpPathMetric = fpPathMetric
     
@@ -169,7 +172,6 @@ class XDPad(XKeypadADT):
                     iScore = XDPad.__fpPathMetric(sPath, pPairPathLengths)
                     if iMinScore == -1 or iScore < iMinScore:
                         iMinScore = iScore
-                        sMinPath = sPath
                 pPathIndex[sKey] = iMinScore
         return pPathIndex
     
@@ -178,8 +180,8 @@ class XDPad(XKeypadADT):
         sConfig = XDPad.g_sConfig
         for cStartSprite in sConfig:
             for cEndSprite in sConfig:
-                tStartPosition = self._pPositionIndex[cStartSprite]
-                tEndPosition = self._pPositionIndex[cEndSprite]
+                tStartPosition = self._getPosition(cStartSprite)
+                tEndPosition = self._getPosition(cEndSprite)
                 pAllPaths = self._getAllPaths(tStartPosition, tEndPosition)
                 sKey = cStartSprite + cEndSprite
                 pPathCache[sKey] = pAllPaths
