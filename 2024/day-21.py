@@ -277,12 +277,10 @@ def Alg1(sFileName):
     for sCode in pCodes:
         iNumeric = getNumeric(sCode)
         sCode = pNumpad.Navigate(sCode)
-        print(sCode)
         pNumpad.Reset()
         for _ in range(2):
             sCode = pControlpad.Navigate(sCode)
             pControlpad.Reset()
-        print(sCode, len(sCode))
         iTotal += iNumeric * len(sCode)
     return iTotal
 
