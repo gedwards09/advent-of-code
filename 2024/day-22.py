@@ -11,28 +11,10 @@ class XNumberGenerator:
         return iInt
 
     def GetNextInt(iInt):
-        iInt = XNumberGenerator.Step1(iInt)
-        iInt = XNumberGenerator.Step2(iInt)
-        iInt = XNumberGenerator.Step3(iInt)
+        iInt ^= (iInt << 6) & XNumberGenerator.g_iPruneConstant
+        iInt ^= (iInt >> 5) & XNumberGenerator.g_iPruneConstant
+        iInt ^= (iInt << 11) & XNumberGenerator.g_iPruneConstant
         return iInt
-
-    def Step1(iInt):
-        iInt = XNumberGenerator.Mix(iInt, iInt << 6)
-        return XNumberGenerator.Prune(iInt)
-    
-    def Step2(iInt):
-        iInt = XNumberGenerator.Mix(iInt, iInt >> 5)
-        return XNumberGenerator.Prune(iInt)
-    
-    def Step3(iInt):
-        iInt = XNumberGenerator.Mix(iInt, iInt << 11)
-        return XNumberGenerator.Prune(iInt)
-
-    def Mix(iInt, iVal):
-        return iInt ^ iVal
-    
-    def Prune(iInt):
-        return iInt & XNumberGenerator.g_iPruneConstant
     
 class XPriceMaximizer:
 
