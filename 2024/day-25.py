@@ -42,7 +42,9 @@ class XKeyMaster:
         return iCount
 
 def Alg1(sFileName):
-    pKeyMaster = XKeyMaster(sFileName)
+    with open(sFileName, 'r') as f:
+        sRawText = f.read()
+    pKeyMaster = XKeyMaster(sRawText=sRawText)
     return pKeyMaster.CountPairs()
 
 def Alg2(sFileName):
