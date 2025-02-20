@@ -229,14 +229,16 @@ class XLogicBinaryTree:
 
     def isValid(self):
         iHighestBit = self._pRoot.GetHighestBit()
-        iX = 0x1
-        for _ in range(iHighestBit+1):
-            iY = 0x1
-            for __ in range(iHighestBit+1):
+        iRef = 0x7 << iHighestBit >> 1
+        # print("{:0x}".format(iRef))
+        iX = iRef
+        for _ in range(3):
+            iY = iRef
+            for __ in range(3):
                 if self.Evaluate(iX, iY) != 0x1 & (iX + iY) >> iHighestBit:
                     return False
-                iY |= iY << 1
-            iX |= iX << 1
+                iY >>= 1
+            iX >>= 1
         return True
 
     def Evaluate(self, iX, iY):
