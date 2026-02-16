@@ -16,6 +16,10 @@ ISolution* SolutionFactory::Build(int type, SolutionArgs* args)
     {
         return new Day01(filename);
     }
+    if (type == 2)
+    {
+        return new Day02(filename);
+    }
     else
     {
         return NULL;
