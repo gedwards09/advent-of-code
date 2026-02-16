@@ -3,9 +3,10 @@
 #include <vector>
 #include <algorithm>
 
-#include "Tester.h"
 #include "FileReader.h"
 #include "SolutionArgs.h"
+
+#include "Tester.h"
 
 namespace fs = std::filesystem;
 

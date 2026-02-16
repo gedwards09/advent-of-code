@@ -35,7 +35,6 @@ class RepeatIDValidator
         static long long repeatMultiplier(int value);
         static long long sumMultiInvalidIDs(
                 std::string lowerBoundstr, std::string upperBoundStar);
-        
 };
 
 #endif // __REPEAT_ID_VALIDATOR_H__
