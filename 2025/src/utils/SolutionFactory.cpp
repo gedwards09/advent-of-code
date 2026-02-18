@@ -20,6 +20,10 @@ ISolution* SolutionFactory::Build(int type, SolutionArgs* args)
     {
         return new Day02(filename);
     }
+    if (type == 3)
+    {
+        return new Day03(filename);
+    }
     else
     {
         return NULL;

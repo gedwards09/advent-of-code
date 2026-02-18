@@ -3,5 +3,6 @@
 
 #include "Day01.h"
 #include "Day02.h"
+#include "Day03.h"
 
 #endif // __DAYS_H__
