@@ -152,7 +152,6 @@ int RepeatIDValidator::power10Int(int exp)
 long long RepeatIDValidator::repeatBase10DigitStringValue(int value, int times)
 {
     long long m;
-    int strlen;
     long long out;
 
     if (RepeatIDValidator::base10StringValueHasLowerRepeatSubpattern(value, times))
@@ -179,7 +178,6 @@ bool RepeatIDValidator::base10StringValueHasLowerRepeatSubpattern(int value, int
     int h;
     long long m;
     int strlen;
-    long long out;
 
     // nothing to check
     if (repeatTimes < 3)
@@ -288,13 +286,10 @@ long long RepeatIDValidator::SumMultiInvalidIDs(std::string rawString)
 
 long long RepeatIDValidator::sumMultiInvalidIDs(std::string lowerBoundStr, std::string upperBoundStr)
 {
-    int lowerBound;
-    int upperBound;
     int len;
     int lcm;
     long long count;
     int repeatTimes;
-    long long value;
 
     len = upperBoundStr.length();
     lcm = 1;
