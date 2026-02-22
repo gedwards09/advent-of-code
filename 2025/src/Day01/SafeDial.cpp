@@ -1,7 +1,7 @@
+#include <cassert>
 #include <iostream>
-#include "SafeDial.h"
 
-template class Array<int>;
+#include "SafeDial.h"
 
 SafeDial::~SafeDial()
 {
@@ -34,7 +34,7 @@ SafeDial::SafeDial(std::string* contents, int szContents) : SafeDial()
         {
             throw std::runtime_error("Day01.cpp:Unrecognized command: " + line + "\n");
         }
-        this->_array->Append(value);
+        this->_array->Append(new int(value));
     }
 }
 
@@ -42,12 +42,15 @@ int SafeDial::Count()
 {
     int position;
     int count;
+    int* p;
 
     position = 50;
     count = 0;
     for (int i = 0; i < this->_array->Size(); i++)
     {
-        position += this->_array->Get(i);
+        p = this->_array->Get(i);
+        assert(p != NULL);
+        position += *p;
         if (position % 100 == 0)
         {
             count += 1;
@@ -65,13 +68,16 @@ int SafeDial::CountPasses()
     int lastPosition;
     int lastWindingNum;
     int count;
+    int* p;
 
     lastPosition = 50;
     lastWindingNum = 0;
     count = 0;
     for (int i = 0; i < this->_array->Size(); i++)
     {
-        curPosition = lastPosition + this->_array->Get(i);
+        p = this->_array->Get(i);
+        assert(p != NULL);
+        curPosition = lastPosition + *p;
 
         if (curPosition > 0)
         {
@@ -82,7 +88,9 @@ int SafeDial::CountPasses()
             curWindingNum = (curPosition - SZ_DIAL + 1) / SZ_DIAL;
         }
 
-        if (this->_array->Get(i) >= 0)
+        p = this->_array->Get(i);
+        assert(p != NULL);
+        if (*p >= 0)
         { 
             count += curWindingNum - lastWindingNum;
         }

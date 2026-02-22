@@ -12,18 +12,18 @@ class Array
     public:
         ~Array();
         Array();
-        void Append(T value);
-        T Get(int i);
+        void Append(T* value);
+        T* Get(int i);
         bool IsEmpty();
         int Size();
 
     private:
         int _sz;
         int _capacity;
-        T* _array;
+        T** _array;
 
         void grow();
-        int growCapacity();
+        static int GrowCapacity(int capacity);
 };
 
 template <typename T>
@@ -32,6 +32,12 @@ Array<T>::Array() : _sz(0), _capacity(0), _array(NULL) {  }
 template <typename T>
 Array<T>::~Array()
 {
+    for (int i = 0; i < this->_sz; i++)
+    {
+        free(this->_array[i]);
+        this->_array[i] = NULL;
+    }
+
     if (this->_array != NULL)
     {
         free(this->_array);
@@ -40,7 +46,7 @@ Array<T>::~Array()
 }
 
 template <typename T>
-void Array<T>::Append(T value)
+void Array<T>::Append(T* value)
 {
     if (this->_capacity < this->_sz + 1)
     {
@@ -55,34 +61,35 @@ template <typename T>
 void Array<T>::grow()
 {
     int newCapacity;
-    T* result;
+    T** result;
 
-    newCapacity = this->growCapacity();
-    result = (T*)realloc(this->_array, sizeof(T) * newCapacity);
+    newCapacity = Array<T>::GrowCapacity(this->_capacity);
+    result = (T**)realloc(this->_array, sizeof(T*) * newCapacity);
     if (result == NULL)
     {
         throw std::runtime_error("Array.cpp:Out of memory error.");
     }
     this->_array = result;
+    this->_capacity = newCapacity;
 }
 
 template <typename T>
-int Array<T>::growCapacity()
+int Array<T>::GrowCapacity(int capacity)
 {
-    if (this->_capacity < DEFAULT_CAPACITY)
+    if (capacity < DEFAULT_CAPACITY)
     {
-        this->_capacity = DEFAULT_CAPACITY;
+        capacity = DEFAULT_CAPACITY;
     }
     else
     {
-        this->_capacity *= 2;
+        capacity *= 2;
     }
 
-    return this->_capacity;
+    return capacity;
 }
 
 template <typename T>
-T Array<T>::Get(int i)
+T* Array<T>::Get(int i)
 {
     if (i < 0 || i >= _sz)
     {
