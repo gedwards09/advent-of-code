@@ -83,10 +83,9 @@ void Heap<T,S>::grow()
     capacity = Heap<T,S>::GrowCapacity(this->_capacity);
     array = (T**)realloc(this->_array, sizeof(T*) * capacity);
     assert(array != NULL);
-    if (this->_capacity < HEAP_DEFAULT_SIZE)
+    for (int i = this->_capacity; i < capacity; i++)
     {
-        // the first time we allocate make sure 0-index slot is nulled
-        array[0] = NULL;
+        array[i] = NULL;
     }
 
     this->_array = array;
