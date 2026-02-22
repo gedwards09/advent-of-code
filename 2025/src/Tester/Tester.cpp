@@ -1,7 +1,9 @@
-#include <string>
-#include <iostream>
-#include <vector>
+
 #include <algorithm>
+#include <chrono>
+#include <iostream>
+#include <string>
+#include <vector>
 
 #include "FileReader.h"
 #include "SolutionArgs.h"
@@ -62,8 +64,24 @@ void Tester::RunAllTests()
             {
                 std::string expected[1];
                 FileReader::ReadContentsIntoBuffer(outEasyPath.string(), expected, 1);
+                auto start = std::chrono::high_resolution_clock::now();
                 std::string actual = solution->SolveEasy();
-                AssertResultsAreEqual(dayNum, expected[0], actual, inputFilename, outEasyPath.string(), "1");
+                auto end = std::chrono::high_resolution_clock::now();
+                auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+                std::cout << "Day " << dayNum << " Test: " << inputFilename
+                        << " Part 1 ";
+                if (Tester::ResultsAreEqual(expected[0], actual))
+                {
+                    std::cout << " failed: " << outHardPath.string() 
+                            << std::endl;
+                    std::cout << "Expected: " << expected << " Actual: " 
+                            << actual <<std::endl;
+                }
+                else
+                {
+                    std:: cout << " (" << duration.count() << " ms)." 
+                            << std::endl;
+                }
             }
             else
             {
@@ -77,8 +95,25 @@ void Tester::RunAllTests()
             {
                 std::string expected[1];
                 FileReader::ReadContentsIntoBuffer(outHardPath.string(), expected, 1);
+                auto start = std::chrono::high_resolution_clock::now();
                 std::string actual = solution->SolveHard();
-                AssertResultsAreEqual(dayNum, expected[0], actual, inputFilename, outHardPath.string(), "2");
+                auto end = std::chrono::high_resolution_clock::now();
+                auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+                std::cout << "Day " << dayNum << " Test: " << inputFilename
+                        << " Part 2 ";
+                if (Tester::ResultsAreEqual(expected[0], actual))
+                {
+                    std::cout << " failed: " << outHardPath.string() 
+                            << std::endl;
+                    std::cout << "Expected: " << expected << " Actual: " 
+                            << actual <<std::endl;
+                }
+                else
+                {
+                    std:: cout << " (" << duration.count() << " ms)." 
+                            << std::endl;
+                }
+
             }
             else
             {
@@ -176,22 +211,7 @@ ISolution* Tester::GetSolution(SolutionFactory* factory, int dayNum, std::string
     return solution;
 }
 
-void Tester::AssertResultsAreEqual(
-        int dayNum, std::string expected, std::string actual, 
-        std::string inputFilename, std::string outputFilename, 
-        const char* part)
+bool Tester::ResultsAreEqual(std::string expected, std::string actual)
 {
-    if (actual != expected)
-    {
-        std::cout << "Day " << dayNum << ", Test: " << inputFilename
-                << " Part " << part << " failed: " << outputFilename
-                << std::endl;
-        std::cout << "Expected: " << expected << " Actual: " << actual 
-                << std::endl;
-    }
-    else
-    {
-        std::cout << "Day " << dayNum << " Test: " << inputFilename << " Part " 
-                << part << " Passed." << std::endl;
-    }
+    return actual != expected;
 }

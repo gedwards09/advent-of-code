@@ -23,10 +23,7 @@ class Tester
         static bool IsInputFile(const fs::path& p);
         static ISolution* GetSolution(
                 SolutionFactory* factory, int dayNum, std::string filename);
-        static void AssertResultsAreEqual(
-                int dayNum, std::string expected, std::string actual, 
-                std::string inputFilename, std::string outputFilename, 
-                const char* part);
+        static bool ResultsAreEqual(std::string expected, std::string actual);
 };
 
 #endif // __TESTER_H__
