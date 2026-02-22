@@ -1,10 +1,9 @@
 #ifndef __ARRAY_H__
 #define __ARRAY_H__
 
-#include <cstddef>
-#include <stdexcept>
+#include <cassert>
 
-#define DEFAULT_CAPACITY (64)
+#define ARRAY_DEFAULT_CAPACITY (64)
 
 template <typename T>
 class Array
@@ -16,33 +15,25 @@ class Array
         T* Get(int i);
         bool IsEmpty();
         int Size();
+        void Clear();
+        void DeleteAllAndClear();
 
     private:
-        int _sz;
-        int _capacity;
         T** _array;
+        int _capacity;
+        int _sz;
 
         void grow();
         static int GrowCapacity(int capacity);
 };
 
 template <typename T>
-Array<T>::Array() : _sz(0), _capacity(0), _array(NULL) {  }
+Array<T>::Array() : _array(NULL), _capacity(0), _sz(0) {  }
 
 template <typename T>
 Array<T>::~Array()
 {
-    for (int i = 0; i < this->_sz; i++)
-    {
-        free(this->_array[i]);
-        this->_array[i] = NULL;
-    }
-
-    if (this->_array != NULL)
-    {
-        free(this->_array);
-        this->_array = NULL;
-    }
+    this->Clear();
 }
 
 template <typename T>
@@ -60,25 +51,26 @@ void Array<T>::Append(T* value)
 template <typename T>
 void Array<T>::grow()
 {
-    int newCapacity;
-    T** result;
+    int capacity;
+    T** array;
 
-    newCapacity = Array<T>::GrowCapacity(this->_capacity);
-    result = (T**)realloc(this->_array, sizeof(T*) * newCapacity);
-    if (result == NULL)
+    capacity = Array<T>::GrowCapacity(this->_capacity);
+    array = (T**)realloc(this->_array, sizeof(T*) * capacity);
+    assert(array != NULL);
+    for (int i = this->_capacity; i < capacity; i++)
     {
-        throw std::runtime_error("Array.cpp:Out of memory error.");
+        array[i] = NULL;
     }
-    this->_array = result;
-    this->_capacity = newCapacity;
+    this->_array = array;
+    this->_capacity = capacity;
 }
 
 template <typename T>
 int Array<T>::GrowCapacity(int capacity)
 {
-    if (capacity < DEFAULT_CAPACITY)
+    if (capacity < ARRAY_DEFAULT_CAPACITY)
     {
-        capacity = DEFAULT_CAPACITY;
+        capacity = ARRAY_DEFAULT_CAPACITY;
     }
     else
     {
@@ -91,11 +83,7 @@ int Array<T>::GrowCapacity(int capacity)
 template <typename T>
 T* Array<T>::Get(int i)
 {
-    if (i < 0 || i >= _sz)
-    {
-        throw new std::runtime_error("Array: Out of bounds index error");
-    }
-
+    assert(0 <= i && i < this->_sz);
     return _array[i];
 }
 
@@ -110,4 +98,25 @@ int Array<T>::Size()
 {
     return this->_sz;
 }
+
+template <typename T>
+void Array<T>::Clear()
+{
+    free(this->_array);
+    this->_array = NULL;
+    this->_capacity = 0;
+    this->_sz = 0;
+}
+
+template <typename T>
+void Array<T>::DeleteAllAndClear()
+{
+    for (int i = 0; i < this->_sz; i++)
+    {
+        delete this->_array[i];
+        this->_array[i] = NULL;
+    }
+    this->Clear();
+}
+
 #endif // __ARRAY_H__

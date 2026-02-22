@@ -5,8 +5,9 @@
 
 SafeDial::~SafeDial()
 {
-    delete _array;
-    _array = NULL;
+    this->_array->DeleteAllAndClear();
+    delete this->_array;
+    this->_array = NULL;
 }
 
 SafeDial::SafeDial()
