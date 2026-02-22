@@ -4,7 +4,7 @@
 CXX = g++
 
 # Compiler flags
-CXXFLAGS = -std=c++17 -Wall -Wextra -Wreturn-type -g
+CXXFLAGS = -std=c++20 -Wall -Wextra -Wreturn-type -g -MMD -MP
 
 # Target executable
 TARGET = ./build/solution.exe
@@ -24,6 +24,9 @@ INCLUDE = $(foreach dir,$(INCLUDE_DIRS),-I$(dir))
 # Object files
 OBJECTS = $(SOURCES:.cpp=.o)
 
+# Dependency files
+DEPS = $(OBJECTS:.o=.d)
+
 # Default target
 all: $(TARGET)
 
@@ -37,7 +40,7 @@ $(TARGET): $(OBJECTS)
 
 # Clean up build files
 clean:
-	rm -f $(OBJECTS) $(TARGET) $(TARGET).exe
+	rm -f $(OBJECTS) $(DEPS) $(TARGET) $(TARGET).exe
 
 # Rebuild everything
 rebuild: clean all
@@ -60,3 +63,6 @@ help:
 	@echo   help     - Show this help message
 
 .PHONY: all clean rebuild run help
+
+# Include auto-generated dependency files
+-include $(DEPS)
