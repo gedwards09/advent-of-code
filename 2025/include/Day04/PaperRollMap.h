@@ -1,25 +1,21 @@
 #ifndef __PAPER_ROLL_MAP__
 #define __PAPER_ROLL_MAP__
 
-#include "ComparableEntry.h"
-#include "ComparableInteger.h"
+#include "Array.h"
 #include "HashableCoordinate.h"
 #include "HashTable.h"
-#include "Heap.h"
 #include "Map.h"
 
 #define ACCESS_LEVEL_CEIL (4)
 
-typedef Entry<HashableCoordinate, ComparableInteger> entry_t;
+typedef HashableCoordinate entry_t;
+typedef entry_t* p_entry_t;
 
-typedef HashTable<HashableCoordinate,ComparableInteger> hash_table_t;
+typedef HashTable<HashableCoordinate,int> hash_table_t;
 typedef hash_table_t* p_hash_table_t;
 
-typedef ComparableEntry<HashableCoordinate,ComparableInteger,Integer> heap_entry_t;
-typedef heap_entry_t* p_heap_entry_t;
-
-typedef Heap<ComparableEntry<HashableCoordinate, ComparableInteger, Integer>, Entry<HashableCoordinate, ComparableInteger>> heap_t;
-typedef heap_t* p_heap_t;
+typedef Array<HashableCoordinate> list_t;
+typedef list_t* p_list_t;
 
 class PaperRollMap : public Map
 {
@@ -34,8 +30,12 @@ class PaperRollMap : public Map
         bool isPaperRoll(int xCoord, int yCoord);
         bool isAccessible(int xCoord, int yCoord);
         int countNeighbors(int xCoord, int yCoord);
-        void initializeDataStructures(p_hash_table_t pHashTable, p_heap_t pHeap);
+        void initializeDataStructures(p_hash_table_t pHashTable,
+                p_list_t pAccessibleList, p_list_t pInaccessibleList);
+        static void ProcessAccessibleList(p_hash_table_t pHashTable, p_list_t pAccessibleList);
         static void DecrementNeighbors(p_hash_table_t pHashTable, int xCoord, int yCoord);
+        static p_list_t ProcessInaccessibleList(p_hash_table_t pHashTable,
+                p_list_t pAccessibleList, p_list_t pInaccessibleList);
 };
 
 #endif // __PAPER_ROLL_MAP__

@@ -1,8 +1,4 @@
-#include <iostream>
-
-#include "Array.h"
-#include "IHashable.h"
-#include "Heap.h"
+#include <cassert>
 
 #include "PaperRollMap.h"
 
@@ -68,67 +64,87 @@ int PaperRollMap::CountAllAccessibleRolls()
 {
     hash_table_t table;
     p_hash_table_t pTable;
-    p_heap_t pHeap;
-    HashableCoordinate* pCoord;
-    ComparableInteger* pInt;
-    p_heap_entry_t pHeapEntry;
+    p_list_t pAccessibleList;
+    p_list_t pInaccessibleList;
     int count;
 
-    // InitializeDataStructures
     pTable = &table;
-    pHeap = new heap_t;
-    this->initializeDataStructures(pTable, pHeap);
+    pAccessibleList = new list_t();
+    pInaccessibleList = new list_t();
+    this->initializeDataStructures(pTable, pAccessibleList, pInaccessibleList);
 
     count = 0;
-    // ProcessAccessibleRolls
     while (true)
     {
-        int currentCount = 0;
-        while (pHeap->Size() > 0 && pHeap->Peek()->Value()->Value < ACCESS_LEVEL_CEIL)
-        {
-            currentCount++;
-            pHeapEntry = pHeap->Remove();
-            pCoord = pHeapEntry->Key();
-            PaperRollMap::DecrementNeighbors(pTable, pCoord->X(), pCoord->Y());
-            assert(pTable->Delete(pCoord));
-            delete pHeapEntry;
-        }
-
-        if (currentCount == 0)
+        if (pAccessibleList->IsEmpty())
         {
             break;
         }
 
-        count += currentCount;
-
-        p_heap_t pSwapHeap = new heap_t;
-        while (pHeap->Size() > 0)
-        {
-            pHeapEntry = pHeap->Remove();
-            pCoord = pHeapEntry->Key();
-            pTable->Get(pCoord, &pInt);
-            if (pInt->Value != pHeapEntry->Value()->Value)
-            {
-                pHeapEntry->Value()->Value = pInt->Value;
-            }
-            pSwapHeap->Add(pHeapEntry);
-        }
-        
-        delete pHeap;
-        pHeap = pSwapHeap;
-        pSwapHeap = NULL;
+        count += pAccessibleList->Size();
+        PaperRollMap::ProcessAccessibleList(pTable, pAccessibleList);
+        pInaccessibleList = PaperRollMap::ProcessInaccessibleList(pTable, pAccessibleList, pInaccessibleList);
     }
 
-    delete pHeap;
+    pInaccessibleList->DeleteAllAndClear();
+    delete pInaccessibleList;
+    delete pAccessibleList;
     return count;
 }
 
-void PaperRollMap::DecrementNeighbors(p_hash_table_t pHashTable, int xCoord, int yCoord)
+void PaperRollMap::initializeDataStructures(p_hash_table_t pHashTable, 
+        p_list_t pAccessibleList, p_list_t pInaccessibleList)
+{
+    int yCoord;
+    int xCoord;
+    int neighbors;
+    p_entry_t pCoord;
+    int* pInt;
+
+    for (yCoord = 0; this->IsValidYCoord(yCoord); yCoord++)
+    {
+        for (xCoord = 0; this->IsValidXCoord(xCoord); xCoord++)
+        {
+            if (this->isPaperRoll(xCoord, yCoord))
+            {
+                neighbors = this->countNeighbors(xCoord, yCoord);
+                pCoord = new HashableCoordinate(xCoord, yCoord);
+                pInt = new int(neighbors);
+                pHashTable->Set(pCoord, pInt);
+
+                pCoord = new HashableCoordinate(xCoord, yCoord);
+                if (neighbors < ACCESS_LEVEL_CEIL)
+                {
+                    pAccessibleList->Append(pCoord);
+                }
+                else
+                {
+                    pInaccessibleList->Append(pCoord);
+                }
+            }
+        }
+    }
+}
+
+void PaperRollMap::ProcessAccessibleList(p_hash_table_t pHashTable, p_list_t pAccessibleList)
+{
+    p_entry_t pCoord;
+
+    for (int i = 0; i < pAccessibleList->Size(); i++)
+    {
+        pCoord = pAccessibleList->Get(i);
+        PaperRollMap::DecrementNeighbors(pHashTable, pCoord->X(), pCoord->Y());
+        assert(pHashTable->Delete(pCoord));
+    }
+    pAccessibleList->Clear();
+}
+
+void PaperRollMap::DecrementNeighbors(HashTable<HashableCoordinate, int>* pHashTable, int xCoord, int yCoord)
 {
     int dx;
     int dy;
     HashableCoordinate* pCoord;
-    ComparableInteger* pInt;
+    int* pInt;
 
     for (dx = -1; dx < 2; dx++)
     {
@@ -142,7 +158,7 @@ void PaperRollMap::DecrementNeighbors(p_hash_table_t pHashTable, int xCoord, int
             pCoord = new HashableCoordinate(xCoord + dx, yCoord + dy);
             if (pHashTable->Get(pCoord, &pInt))
             {
-                pInt->Value--;
+                (*pInt)--;
             }
             delete pCoord;
             pCoord = NULL;
@@ -150,31 +166,28 @@ void PaperRollMap::DecrementNeighbors(p_hash_table_t pHashTable, int xCoord, int
     }
 }
 
-void PaperRollMap::initializeDataStructures(p_hash_table_t pHashTable, p_heap_t pHeap)
+p_list_t PaperRollMap::ProcessInaccessibleList(p_hash_table_t pHashTable, p_list_t pAccessibleList, p_list_t pInaccessibleList)
 {
-    int yCoord;
-    int xCoord;
-    int neighbors;
-    HashableCoordinate* pCoord;
-    ComparableInteger* pInt;
-    p_heap_entry_t pHeapEntry;
+    p_list_t pInaccessibleSwapList;
+    p_entry_t pCoord;
+    int* pInt;
 
-    for (yCoord = 0; this->IsValidYCoord(yCoord); yCoord++)
+    pInaccessibleSwapList = new list_t();
+    for (int i = 0; i < pInaccessibleList->Size(); i++)
     {
-        for (xCoord = 0; this->IsValidXCoord(xCoord); xCoord++)
+        pCoord = pInaccessibleList->Get(i);
+        assert(pHashTable->Get(pCoord, &pInt));
+        if (*pInt < ACCESS_LEVEL_CEIL)
         {
-            if (this->isPaperRoll(xCoord, yCoord))
-            {
-                neighbors = this->countNeighbors(xCoord, yCoord);
-                pCoord = new HashableCoordinate(xCoord, yCoord);
-                pInt = new ComparableInteger(neighbors);
-                pHashTable->Set(pCoord, pInt);
-
-                pCoord = new HashableCoordinate(xCoord, yCoord);
-                pInt = new ComparableInteger(neighbors);
-                pHeapEntry = new heap_entry_t(pCoord, pInt);
-                pHeap->Add(pHeapEntry);
-            }
+            pAccessibleList->Append(pCoord);
+        }
+        else
+        {
+            pInaccessibleSwapList->Append(pCoord);
         }
     }
+
+    delete pInaccessibleList;
+    pInaccessibleList = NULL;
+    return pInaccessibleSwapList;
 }
