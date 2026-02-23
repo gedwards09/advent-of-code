@@ -13,10 +13,12 @@ class Array
         Array();
         void Append(T* value);
         T* Get(int i);
+        bool IsValidIndex(int i);
         bool IsEmpty();
         int Size();
         void Clear();
         void DeleteAllAndClear();
+        void Swap(int i, int j);
 
     private:
         T** _array;
@@ -83,8 +85,14 @@ int Array<T>::GrowCapacity(int capacity)
 template <typename T>
 T* Array<T>::Get(int i)
 {
-    assert(0 <= i && i < this->_sz);
+    assert(Array<T>::IsValidIndex(i));
     return _array[i];
+}
+
+template <typename T>
+bool Array<T>::IsValidIndex(int i)
+{
+    return 0 <= i && i < this->_sz;
 }
 
 template <typename T>
@@ -118,5 +126,22 @@ void Array<T>::DeleteAllAndClear()
     }
     this->Clear();
 }
+
+template <typename T>
+void Array<T>::Swap(int i, int j)
+{
+    T* swap;
+
+    assert(this->IsValidIndex(i) && this->IsValidIndex(j));
+    if (i == j)
+    {
+        return;
+    }
+
+    swap = this->_array[i];
+    this->_array[i] = this->_array[j];
+    this->_array[j] = swap;
+}
+
 
 #endif // __ARRAY_H__
