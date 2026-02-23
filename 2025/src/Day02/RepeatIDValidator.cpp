@@ -2,10 +2,6 @@
 
 #include "RepeatIDValidator.h"
 
-const char RepeatIDValidator::s_rangeDelim;
-const char RepeatIDValidator::s_boundDelim;
-const StringSplitter RepeatIDValidator::s_splitter;
-
 // public
 long long RepeatIDValidator::SumInvalidIDs(std::string rawString)
 {
@@ -30,12 +26,12 @@ long long RepeatIDValidator::SumInvalidIDs(std::string rawString)
 
 std::vector<std::string> RepeatIDValidator::splitRanges(std::string rawString)
 {
-    return RepeatIDValidator::s_splitter.Split(rawString, RepeatIDValidator::s_rangeDelim);
+    return StringSplitter::Split(rawString, RepeatIDValidator::s_rangeDelim);
 }
 
 std::vector<std::string> RepeatIDValidator::splitBounds(std::string rawString)
 {
-    return RepeatIDValidator::s_splitter.Split(rawString, RepeatIDValidator::s_boundDelim);
+    return StringSplitter::Split(rawString, RepeatIDValidator::s_boundDelim);
 }
 
 long long RepeatIDValidator::sumInvalidIDs(std::string lowerBoundStr, std::string upperBoundStr)

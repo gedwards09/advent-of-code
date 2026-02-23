@@ -16,7 +16,6 @@ class RepeatIDValidator
     private:
         static const char s_rangeDelim = ',';
         static const char s_boundDelim = '-';
-        static const StringSplitter s_splitter;
 
         static std::vector<std::string> splitRanges(std::string rawString);
         static std::vector<std::string> splitBounds(std::string rawString);
