@@ -32,6 +32,10 @@ ISolution* SolutionFactory::Build(int type, SolutionArgs* args)
     {
         return new Day05(filename);
     }
+    if (type == 6)
+    {
+        return new Day06(filename);
+    }
     else
     {
         throw std::runtime_error("SolutionFactory.cpp:Option not implemented\n");

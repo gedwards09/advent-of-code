@@ -14,6 +14,7 @@ class DigitString : public IComparable<DigitString>
         int CompareTo(DigitString* other);
         int Length();
         int DigitInPlace(int i);
+        static int DigitValue(char c);
         void Print();
         static bool IsDigitString(std::string line);
         long long DifferenceWith(DigitString* other);

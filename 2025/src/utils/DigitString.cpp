@@ -40,7 +40,12 @@ int DigitString::Length()
 int DigitString::DigitInPlace(int i)
 {
     assert(0 <= i && i < this->_szString);
-    return (int)(this->_string[i] - DigitString::s_charZero);
+    return DigitString::DigitValue(this->_string[i]);
+}
+
+int DigitString::DigitValue(char c)
+{
+    return (int)(c - DigitString::s_charZero);
 }
 
 int DigitString::CompareTo(DigitString* other)
