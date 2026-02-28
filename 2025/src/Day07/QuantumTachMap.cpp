@@ -30,7 +30,7 @@ int QuantumTachMap::Init()
 
 bool QuantumTachMap::HasBeam(size_t xCoord)
 {
-    return *(this->_pArray->Get(xCoord));
+    return *(this->_pArray->Get(xCoord)) > 0;
 }
 
 long long QuantumTachMap::SplitBeamCount(size_t xCoord)
