@@ -14,6 +14,7 @@ class Map : public IMap
         char GetCoord(int i, int j) override;
         bool IsValidXCoord(int xCoord) override;
         bool IsValidYCoord(int yCoord) override;
+        void Print();
 
     private:
         const std::string* _pContents;

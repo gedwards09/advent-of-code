@@ -1,4 +1,5 @@
 #include <cassert>
+#include <iostream>
 
 #include "IMap.h"
 #include "Map.h"
@@ -64,4 +65,12 @@ bool Map::IsValidYCoord(int yCoord)
 bool Map::isValidCoord(int coord, size_t bound)
 {
     return 0 <= coord && (size_t)coord < bound;
+}
+
+void Map::Print()
+{
+    for (size_t yCoord = 0; yCoord < this->_szY; yCoord++)
+    {
+        std::cout << this->_pContents[yCoord] << std::endl;
+    }
 }

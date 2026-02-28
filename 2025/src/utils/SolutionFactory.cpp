@@ -12,28 +12,23 @@ ISolution* SolutionFactory::Build(int type, SolutionArgs* args)
     std::string filename;
     
     filename = args->Filename();
-    if (type == 1)
+    switch (type)
     {
-        return new Day01(filename);
-    }
-    if (type == 2)
-    {
-        return new Day02(filename);
-    }
-    if (type == 3)
-    {
-        return new Day03(filename);
-    }
-    if (type == 4)
-    {
-        return new Day04(filename);
-    }
-    if (type == 5)
-    {
-        return new Day05(filename);
-    }
-    else
-    {
-        throw std::runtime_error("SolutionFactory.cpp:Option not implemented\n");
+        case 1:
+            return new Day01(filename);
+        case 2:
+            return new Day02(filename);
+        case 3:
+            return new Day03(filename);
+        case 4:
+            return new Day04(filename);
+        case 5:
+            return new Day05(filename);
+        case 6:
+            return new Day06(filename);
+        case 7:
+            return new Day07(filename);
+        default:
+            throw std::runtime_error("SolutionFactory.cpp:Option not implemented\n");
     }
 }
