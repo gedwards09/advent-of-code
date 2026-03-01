@@ -6,7 +6,7 @@
 
 #include "HashTableEntry.h"
 
-#define MAX_TABLE_LOAD (0.618)
+#define MAX_TABLE_LOAD (0.334)
 #define DEFAULT_TABLE_CAPACITY (256)
 
 template <typename K, typename V>
@@ -20,6 +20,8 @@ class HashTable
         bool Set(K* key, V* value);
         bool Delete(K* key);
         HashTableEntry<K,V>* FindKey(K* key);
+        void DeleteValuesAndClear();
+        void Clear();
 
     private:
         static V s_deleted;
@@ -272,6 +274,54 @@ HashTableEntry<K,V>* HashTable<K,V>::FindKey(HashTableEntry<K,V>* entries, int c
     //unreachable
     assert(false);
     return NULL;
+}
+
+/** 
+ * Deletes values but not keys and clears table.
+ * Use for non-owned keys.
+ */
+template <typename K, typename V>
+requires std::derived_from<K, IHashable>
+void HashTable<K,V>::DeleteValuesAndClear()
+{
+    Entry<K,V>* pEntry;
+
+    for (int i = 0; i < this->_capacity; i++)
+    {
+        pEntry = &this->_entries[i];
+        if (pEntry->Value() != NULL && pEntry->Value() != (V*)&HashTable<K,V>::s_deleted)
+        {
+            delete pEntry->Value();
+        }
+        pEntry->SetValue(NULL);
+        pEntry->SetKey(NULL);
+    }
+    delete[] this->_entries;
+    this->_entries = NULL;
+    this->_capacity = 0;
+    this->_count = 0;
+}
+
+/** 
+ * Clears table without deleting keys or value pointers
+ * Use for non-owned key-values.
+ */
+template <typename K, typename V>
+requires std::derived_from<K, IHashable>
+void HashTable<K,V>::Clear()
+{
+    Entry<K,V>* pEntry;
+
+    for (int i = 0; i < this->_capacity; i++)
+    {
+        pEntry = &this->_entries[i];
+        pEntry->SetValue(NULL);
+        pEntry->SetKey(NULL);
+    }
+    delete[] this->_entries;
+    this->_entries = NULL;
+    this->_capacity = 0;
+    this->_count = 0;
 }
 
 #endif // __HASH_TABLE_H__

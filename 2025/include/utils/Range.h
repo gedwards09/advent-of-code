@@ -8,6 +8,7 @@
 class Range
 {
     public:
+        ~Range();
         Range(std::string line);
         DigitString* GetLower();
         DigitString* GetUpper();

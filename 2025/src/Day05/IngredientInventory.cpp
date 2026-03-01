@@ -5,6 +5,12 @@
 
 #include "IngredientInventory.h"
 
+IngredientInventory::~IngredientInventory()
+{
+    delete this->_ranges;
+    delete this->_ids;
+}
+
 IngredientInventory::IngredientInventory(
         std::string contents[], size_t szContents) :
         _ranges(NULL), _ids(NULL)

@@ -8,5 +8,6 @@
 #include "Day05.h"
 #include "Day06.h"
 #include "Day07.h"
+#include "Day08.h"
 
 #endif // __DAYS_H__

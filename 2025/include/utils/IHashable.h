@@ -9,7 +9,7 @@ class IHashable
 {
     public:
         virtual ~IHashable() = default;
-        virtual hash_t Hash() = 0;
+        virtual hash_t Hash() const = 0;
 };
 
 #endif // __I_HASHABLE_H__

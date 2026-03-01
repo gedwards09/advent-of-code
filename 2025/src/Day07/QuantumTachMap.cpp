@@ -3,6 +3,8 @@
 QuantumTachMap::~QuantumTachMap()
 {
     this->_pArray->DeleteAllAndClear();
+    delete this->_pArray;
+    this->_pArray = NULL;
 }
 
 QuantumTachMap::QuantumTachMap(std::string contents[], size_t szContents) : 

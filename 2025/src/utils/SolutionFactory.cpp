@@ -28,6 +28,8 @@ ISolution* SolutionFactory::Build(int type, SolutionArgs* args)
             return new Day06(filename);
         case 7:
             return new Day07(filename);
+        case 8:
+            return new Day08(filename);
         default:
             throw std::runtime_error("SolutionFactory.cpp:Option not implemented\n");
     }

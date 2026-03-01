@@ -1,5 +1,7 @@
 #include <cassert>
 
+#include "Coordinate.h"
+
 #include "PaperRollMap.h"
 
 int PaperRollMap::CountAccessibleRolls()
@@ -59,7 +61,6 @@ int PaperRollMap::countNeighbors(int xCoord, int yCoord)
     return count;
 }
 
-// int PaperRollMap::ProcessAccessibleRolls(p_hash_table_t pTable, p_heap_t pHeap);
 int PaperRollMap::CountAllAccessibleRolls()
 {
     hash_table_t table;
@@ -108,11 +109,11 @@ void PaperRollMap::initializeDataStructures(p_hash_table_t pHashTable,
             if (this->isPaperRoll(xCoord, yCoord))
             {
                 neighbors = this->countNeighbors(xCoord, yCoord);
-                pCoord = new HashableCoordinate(xCoord, yCoord);
+                pCoord = new HashableCoordinate(new Coordinate(xCoord, yCoord));
                 pInt = new int(neighbors);
                 pHashTable->Set(pCoord, pInt);
 
-                pCoord = new HashableCoordinate(xCoord, yCoord);
+                pCoord = new HashableCoordinate(new Coordinate(xCoord, yCoord));
                 if (neighbors < ACCESS_LEVEL_CEIL)
                 {
                     pAccessibleList->Append(pCoord);
@@ -136,7 +137,7 @@ void PaperRollMap::ProcessAccessibleList(p_hash_table_t pHashTable, p_list_t pAc
         PaperRollMap::DecrementNeighbors(pHashTable, pCoord->X(), pCoord->Y());
         assert(pHashTable->Delete(pCoord));
     }
-    pAccessibleList->Clear();
+    pAccessibleList->DeleteAllAndClear();
 }
 
 void PaperRollMap::DecrementNeighbors(HashTable<HashableCoordinate, int>* pHashTable, int xCoord, int yCoord)
@@ -155,7 +156,7 @@ void PaperRollMap::DecrementNeighbors(HashTable<HashableCoordinate, int>* pHashT
                 continue;
             }
             
-            pCoord = new HashableCoordinate(xCoord + dx, yCoord + dy);
+            pCoord = new HashableCoordinate(new Coordinate(xCoord + dx, yCoord + dy));
             if (pHashTable->Get(pCoord, &pInt))
             {
                 (*pInt)--;

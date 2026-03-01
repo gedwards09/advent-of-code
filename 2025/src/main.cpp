@@ -67,6 +67,9 @@ int main (int argc, char* argv[])
         ISolution* solution = factory->Build(num, args);
         std::cout << solution->SolveEasy() << std::endl;
         std::cout << solution->SolveHard() << std::endl;
+
+        delete args;
+        delete factory;
     }
 
     return 0;

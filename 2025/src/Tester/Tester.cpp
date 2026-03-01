@@ -17,11 +17,11 @@ static const fs::path s_testsRoot = fs::path(".") / "tests";
 void Tester::RunAllTests()
 {
     const fs::path testsRoot = fs::path(".") / "tests";
-    SolutionFactory* factory;
+    SolutionFactory factory;
+    SolutionFactory* pFactory;
     std::vector<fs::path> dayDirs;
-    int dayNum;
-    std::string dayName;
-    ISolution* solution;
+
+    pFactory = &factory;
 
     if (!fs::exists(testsRoot) || !fs::is_directory(testsRoot))
     {
@@ -29,106 +29,88 @@ void Tester::RunAllTests()
         return;
     }
 
-    factory = new SolutionFactory();
     Tester::InitDirs(dayDirs, testsRoot);
 
     for (const fs::path& dayDir : dayDirs)
     {
-        dayNum = 0;
-        dayName = dayDir.filename().string();
-        if (!Tester::TryParseDayNumberFromDirName(dayName, dayNum))
-        {
-            continue;
-        }
+        Tester::RunDayTests(pFactory, dayDir);
+    }
+}
 
-        std::vector<fs::path> inputs;
-        Tester::InitInputFiles(inputs, dayDir);
+void Tester::RunDayTests(SolutionFactory* factory, const fs::path& dayDir)
+{
+    int dayNum = 0;
+    std::string dayName = dayDir.filename().string();
 
-        for (const fs::path& inputPath : inputs)
-        {
-            const std::string inputFilename = inputPath.filename().string();
-            const std::string stem = inputPath.stem().string();
-            const fs::path outEasyPath = dayDir / (stem + "-1.out");
-            const fs::path outHardPath = dayDir / (stem + "-2.out");
-
-            solution = GetSolution(factory, dayNum, inputPath.string());
-            if (solution == NULL)
-            {
-                std::cout << "Day " << dayNum << " Test: " << inputFilename
-                          << " Skipped: no solution built" << std::endl;
-                continue;
-            }
-
-            // Part 1 (easy)
-            if (fs::exists(outEasyPath) && fs::is_regular_file(outEasyPath))
-            {
-                std::string expected[1];
-                FileReader::ReadContentsIntoBuffer(outEasyPath.string(), expected, 1);
-                auto start = std::chrono::high_resolution_clock::now();
-                std::string actual = solution->SolveEasy();
-                auto end = std::chrono::high_resolution_clock::now();
-                auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-                std::cout << "Day " << dayNum << " Test: " << inputFilename
-                        << " Part 1 ";
-                if (Tester::ResultsAreEqual(expected[0], actual))
-                {
-                    std::cout << " failed: " << outHardPath.string() 
-                            << std::endl;
-                    std::cout << "Expected: " << expected << " Actual: " 
-                            << actual <<std::endl;
-                }
-                else
-                {
-                    std:: cout << " (" << duration.count() << " ms)." 
-                            << std::endl;
-                }
-            }
-            else
-            {
-                std::cout << "Day " << dayNum << " Test: " << inputFilename
-                          << " Part 1 Skipped: " << outEasyPath.string() << " not found."
-                          << std::endl;
-            }
-
-            // Part 2 (hard)
-            if (fs::exists(outHardPath) && fs::is_regular_file(outHardPath))
-            {
-                std::string expected[1];
-                FileReader::ReadContentsIntoBuffer(outHardPath.string(), expected, 1);
-                auto start = std::chrono::high_resolution_clock::now();
-                std::string actual = solution->SolveHard();
-                auto end = std::chrono::high_resolution_clock::now();
-                auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-                std::cout << "Day " << dayNum << " Test: " << inputFilename
-                        << " Part 2 ";
-                if (Tester::ResultsAreEqual(expected[0], actual))
-                {
-                    std::cout << " failed: " << outHardPath.string() 
-                            << std::endl;
-                    std::cout << "Expected: " << expected << " Actual: " 
-                            << actual <<std::endl;
-                }
-                else
-                {
-                    std:: cout << " (" << duration.count() << " ms)." 
-                            << std::endl;
-                }
-
-            }
-            else
-            {
-                std::cout << "Day " << dayNum << " Test: " << inputFilename
-                          << " Part 2 Skipped: " << outHardPath.string() << " not found."
-                          << std::endl;
-            }
-
-            delete solution;
-            solution = NULL;
-        }
+    if (!Tester::TryParseDayNumberFromDirName(dayName, dayNum))
+    {
+        return;
     }
 
-    delete factory;
-    factory = NULL;
+    std::vector<fs::path> inputs;
+    Tester::InitInputFiles(inputs, dayDir);
+
+    for (const fs::path& inputPath : inputs)
+    {
+        Tester::RunTestCase(factory, dayNum, dayDir, inputPath);
+    }
+}
+
+void Tester::RunTestCase(SolutionFactory* factory, int dayNum,
+        const fs::path& dayDir, const fs::path& inputPath)
+{
+    const std::string inputFilename = inputPath.filename().string();
+    const std::string stem = inputPath.stem().string();
+    const fs::path outEasyPath = dayDir / (stem + "-1.out");
+    const fs::path outHardPath = dayDir / (stem + "-2.out");
+
+    ISolution* solution = GetSolution(factory, dayNum, inputPath.string());
+    if (solution == NULL)
+    {
+        std::cout << "Day " << dayNum << " Test: " << inputFilename
+                  << " Skipped: no solution built" << std::endl;
+        return;
+    }
+
+    Tester::RunPart(solution, dayNum, inputFilename, outEasyPath, 1, true);
+    Tester::RunPart(solution, dayNum, inputFilename, outHardPath, 2, false);
+
+    delete solution;
+}
+
+void Tester::RunPart(ISolution* solution, int dayNum,
+        const std::string& inputFilename, const fs::path& outPath,
+        int partNum, bool isEasy)
+{
+    if (!fs::exists(outPath) || !fs::is_regular_file(outPath))
+    {
+        std::cout << "Day " << dayNum << " Test: " << inputFilename
+                  << " Part " << partNum << " Skipped: " << outPath.string()
+                  << " not found." << std::endl;
+        return;
+    }
+
+    std::string expected[1];
+    FileReader::ReadContentsIntoBuffer(outPath.string(), expected, 1);
+
+    auto start = std::chrono::high_resolution_clock::now();
+    std::string actual = isEasy ? solution->SolveEasy() : solution->SolveHard();
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+
+    std::cout << "Day " << dayNum << " Test: " << inputFilename
+              << " Part " << partNum;
+
+    if (Tester::ResultsAreEqual(expected[0], actual))
+    {
+        std::cout << " (" << duration.count() << " ms)." << std::endl;
+    }
+    else
+    {
+        std::cout << " failed: " << outPath.string() << std::endl;
+        std::cout << "Expected: " << expected[0] << " Actual: "
+                  << actual << std::endl;
+    }
 }
 
 void Tester::InitDirs(std::vector<fs::path>& dirs, const fs::path& root)
@@ -213,5 +195,5 @@ ISolution* Tester::GetSolution(SolutionFactory* factory, int dayNum, std::string
 
 bool Tester::ResultsAreEqual(std::string expected, std::string actual)
 {
-    return actual != expected;
+    return actual == expected;
 }

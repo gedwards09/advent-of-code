@@ -16,6 +16,15 @@ class Tester
     private:
         static const fs::path s_testsRoot;
 
+        static void RunDayTests(SolutionFactory* factory, const fs::path& dayDir);
+        static void RunTestCase(
+                SolutionFactory* factory, int dayNum,
+                const fs::path& dayDir, const fs::path& inputPath);
+        static void RunPart(
+                ISolution* solution, int dayNum,
+                const std::string& inputFilename, const fs::path& outPath,
+                int partNum, bool isEasy);
+
         static void InitDirs(std::vector<fs::path>& dirs, const fs::path& root);
         static bool TryParseDayNumberFromDirName(const std::string& name, int& dayNum);
         static bool IsDigit(char c);

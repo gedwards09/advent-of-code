@@ -7,6 +7,7 @@
 class CephalopodMath
 {
     public:
+        ~CephalopodMath();
         CephalopodMath();
         long long ColumnSolve(std::string contents[], size_t szContents);
         static long long CephalopodSolve(std::string contents[], size_t szContents);

@@ -5,6 +5,14 @@
 
 #include "Range.h"
 
+Range::~Range()
+{
+    delete this->_lower;
+    this->_lower = NULL;
+    delete this->_upper;
+    this->_upper = NULL;
+}
+
 Range::Range(std::string line) : _lower(NULL), _upper(NULL)
 {
     std::vector<std::string> arr;

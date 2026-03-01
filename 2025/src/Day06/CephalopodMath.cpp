@@ -9,6 +9,15 @@ const char CephalopodMath::s_space = ' ';
 const char CephalopodMath::s_mult = '*';
 const char CephalopodMath::s_add = '+';
 
+CephalopodMath::~CephalopodMath()
+{
+    this->clear();
+    delete this->_valueArrays;
+    this->_valueArrays = NULL;
+    delete this->_operations;
+    this->_operations = NULL;
+}
+
 void CephalopodMath::clear()
 {
     Array<int>* pArr;
@@ -19,7 +28,10 @@ void CephalopodMath::clear()
         pArr->DeleteAllAndClear();
     }
     this->_valueArrays->DeleteAllAndClear();
-    this->_operations->Clear();
+    if (this->_operations != NULL)
+    {
+        this->_operations->Clear();
+    }
 }
 
 CephalopodMath::CephalopodMath() : 
@@ -50,7 +62,7 @@ long long CephalopodMath::ColumnSolve(std::string contents[], size_t szContents)
         }
     }
 
-    out =  this->solve();
+    out = this->solve();
     this->clear();
     return out;
 }

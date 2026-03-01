@@ -7,6 +7,7 @@
 class IngredientInventory
 {
     public:
+        ~IngredientInventory();
         IngredientInventory(std::string contents[], size_t szContents);
         int CountIngredients();
         long long CountEntireRange();
