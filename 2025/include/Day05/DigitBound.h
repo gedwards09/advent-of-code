@@ -9,7 +9,7 @@ class DigitBound : public IComparable<DigitBound>
         DigitBound(DigitString* digit, DigitBoundEnum type);
         bool IsLower();
         bool IsUpper();
-        virtual int CompareTo(DigitBound* other) override;
+        virtual int CompareTo(DigitBound* other) const override;
         long long DifferenceWith(DigitBound* prev);
         void Print();
 

@@ -10,8 +10,8 @@ class Entry : public IEntry<K,V>
         virtual ~Entry() override;
         Entry();
         Entry(K* key, V* value);
-        virtual K* Key() override;
-        virtual V* Value() override;
+        virtual K* Key() const override;
+        virtual V* Value() const override;
         virtual void SetKey(K* key) override;
         virtual void SetValue(V* value) override;
 
@@ -36,13 +36,13 @@ Entry<K,V>::~Entry()
 }
 
 template <typename K, typename V>
-K* Entry<K,V>::Key()
+K* Entry<K,V>::Key() const
 {
     return this->_key;
 }
 
 template <typename K, typename V>
-V* Entry<K,V>::Value()
+V* Entry<K,V>::Value() const
 {
     return this->_value;
 }

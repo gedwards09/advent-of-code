@@ -12,7 +12,7 @@ long long HashableCoordinatePair::ConstructSquaredDistance(ICoordinate* left, IC
     return left->SquaredDistance(right);
 }
 
-int HashableCoordinatePair::CompareTo(HashableCoordinatePair* other)
+int HashableCoordinatePair::CompareTo(HashableCoordinatePair* other) const
 {
     assert(other != NULL);
     if (this->_dist == other->_dist)

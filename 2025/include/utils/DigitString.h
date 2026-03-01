@@ -11,9 +11,9 @@ class DigitString : public IComparable<DigitString>
 {
     public:
         DigitString(std::string line);
-        int CompareTo(DigitString* other);
-        int Length();
-        int DigitInPlace(int i);
+        virtual int CompareTo(DigitString* other) const override;
+        int Length() const;
+        int DigitInPlace(int i) const;
         static int DigitValue(char c);
         void Print();
         static bool IsDigitString(std::string line);

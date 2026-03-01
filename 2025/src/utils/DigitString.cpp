@@ -32,12 +32,12 @@ bool DigitString::IsDigitString(std::string digitStr)
     return true;
 }
 
-int DigitString::Length()
+int DigitString::Length() const
 {
     return this->_szString;
 }
 
-int DigitString::DigitInPlace(int i)
+int DigitString::DigitInPlace(int i) const
 {
     assert(0 <= i && i < this->_szString);
     return DigitString::DigitValue(this->_string[i]);
@@ -48,7 +48,7 @@ int DigitString::DigitValue(char c)
     return (int)(c - DigitString::s_charZero);
 }
 
-int DigitString::CompareTo(DigitString* other)
+int DigitString::CompareTo(DigitString* other) const
 {
     int otherLen;
     int thisDigit;

@@ -18,11 +18,11 @@ class Heap : IHeap<T, S>
         virtual ~Heap() override;
         Heap();
         Heap(bool isMinHeap);
-        virtual Add(T* item) override;
+        virtual int Add(T* item) override;
         virtual T* Remove() override;
-        virtual T* Peek() override;
-        virtual bool IsEmpty() override;
-        virtual int Size() override;
+        virtual T* Peek() const override;
+        virtual bool IsEmpty() const override;
+        virtual int Size() const override;
         virtual void Clear() override;
 
     private:
@@ -122,10 +122,7 @@ void Heap<T,S>::upHeap(int index)
     int parentIndex;
 
     assert(0 <= index && index < this->_capacity);
-    if (index == 1)
-    {
-        return;
-    }
+   
     parentIndex = index/2;
     while (parentIndex > 0 && (this->_dir) * this->_array[parentIndex]->CompareTo(this->_array[index]) > 0)
     {
@@ -161,8 +158,8 @@ T* Heap<T,S>::Remove()
     assert(this->_count > 0);
     last = this->_count;
     out = this->_array[FIRST_INDEX];
-    this->_array[FIRST_INDEX] = NULL;
-    Heap<T,S>::Swap(this->_array, this->_count, FIRST_INDEX, last);
+    this->_array[FIRST_INDEX] = this->_array[last];
+    this->_array[last] = NULL;
     this->_count--;
     if (this->_count > 0)
     {
@@ -203,7 +200,7 @@ void Heap<T,S>::downHeap(int index)
 
 template<typename T, typename S>
 requires std::derived_from<T, S> && std::derived_from<T, IComparable<S>>
-T* Heap<T,S>::Peek()
+T* Heap<T,S>::Peek() const
 {
     if (this->_count == 0)
     {
@@ -215,14 +212,14 @@ T* Heap<T,S>::Peek()
 
 template<typename T, typename S>
 requires std::derived_from<T, S> && std::derived_from<T, IComparable<S>>
-bool Heap<T,S>::IsEmpty()
+bool Heap<T,S>::IsEmpty() const
 {
     return this->_count == 0;
 }
 
 template<typename T, typename S>
 requires std::derived_from<T, S> && std::derived_from<T, IComparable<S>>
-int Heap<T,S>::Size()
+int Heap<T,S>::Size() const
 {
     return this->_count;
 }

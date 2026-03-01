@@ -2,15 +2,13 @@
 #define __UNION_FIND_H__
 
 #include <concepts>
-#include <iostream>
 
-#include "ComparableInteger.h"
+#include "Array.h"
+#include "HashTable.h"
 #include "Heap.h"
 #include "IHashable.h"
+#include "Integer.h"
 #include "IUnionFind.h"
-
-#define MAX_ITER (1024)
-#define ITER_TO_REDUCE (2)
 
 template <typename T>
 requires std::derived_from<T, IHashable>
@@ -22,18 +20,19 @@ class UnionFind : public IUnionFind<T>
         virtual void Add(T* data) override;
         virtual T* Find(T* data) override;
         virtual void Union(T* thisData, T* thatData) override;
-        virtual Array<int>* ListComponentSizes(Array<int>* pArray) override;
+        virtual Heap<Integer>* ComponentSizeHeap(Heap<Integer>* pHeap) override;
         virtual int GetComponentCount() const override;
 
     private:
         Array<T>* _dataArray;
-        HashTable<T,int>* _parentIDs;
+        Array<int>* _parentIDArray;
+        HashTable<T,int>* _idTable;
         int _count;
 
-        int getParentID(T* data) const;
-        void setParentID(T* data, int id);
+        int getID(T* data) const;
+        int getParentID(int data) const;
+        void setParentID(int id, int parentID);
         int findID(T* data);
-        void compress(T* data, int id);
 };
 
 template <typename T>
@@ -46,16 +45,27 @@ UnionFind<T>::~UnionFind()
         delete this->_dataArray;
         this->_dataArray = NULL;
     }
+
+    if (this->_parentIDArray != NULL)
+    {
+        this->_parentIDArray->Clear();
+        delete this->_parentIDArray;
+        this->_parentIDArray = NULL;
+    }
     
-    delete this->_parentIDs;
-    this->_parentIDs = NULL;
+    if (this->_idTable != NULL)
+    {
+        delete this->_idTable;
+        this->_idTable = NULL;
+    }
 }
 
 template <typename T>
 requires std::derived_from<T, IHashable>
 UnionFind<T>::UnionFind() : 
-        _dataArray(new Array<T>()), 
-        _parentIDs(new HashTable<T,int>()),
+        _dataArray(NULL), 
+        _parentIDArray(NULL),
+        _idTable(NULL),
         _count(0) {  }
 
 template <typename T>
@@ -63,38 +73,56 @@ requires std::derived_from<T, IHashable>
 void UnionFind<T>::Add(T* data)
 {
     int newID;
+    int* pID;
 
     assert(data != NULL);
-    newID = this->_dataArray->Size();
+    if (this->_count == 0)
+    {
+        _dataArray = new Array<T>();
+        this->_parentIDArray = new Array<int>();
+        this->_idTable = new HashTable<T,int>();
+    }
+
+    newID = this->_count;
+    pID = new int(newID);
     this->_dataArray->Append(data);
+    this->_parentIDArray->Append(pID);
     assert(this->_dataArray->Get(newID) == data);
-    assert(this->_parentIDs->Set(data, new int(newID)));
+    assert(this->_parentIDArray->Get(newID) == pID);
+    assert(this->_idTable->Set(data, pID));
     this->_count++;
 }
 
 template <typename T>
 requires std::derived_from<T, IHashable>
-int UnionFind<T>::getParentID(T* data) const
+int UnionFind<T>::getID(T* data) const
 {
-    int* pid;
+    int* pID;
 
     assert(data != NULL);
-    assert(this->_parentIDs->Get(data, &pid));
-    assert(pid != NULL);
+    assert(this->_idTable->Get(data, &pID));
+    assert(pID != NULL);
 
-    return *pid;
+    return *pID;
 }
 
 template <typename T>
 requires std::derived_from<T, IHashable>
-void UnionFind<T>::setParentID(T* data, int id)
+int UnionFind<T>::getParentID(int ID) const
 {
-    int* pid;
+    int* pID;
 
-    assert(data != NULL);
-    this->_parentIDs->Get(data, &pid);
-    assert(pid != NULL);
-    *pid = id;
+    pID = this->_parentIDArray->Get(ID);
+    assert(pID != NULL);
+
+    return *pID;
+}
+
+template <typename T>
+requires std::derived_from<T, IHashable>
+void UnionFind<T>::setParentID(int id, int parentID)
+{
+    *(this->_parentIDArray->Get(id)) = parentID;
 }
 
 template <typename T>
@@ -102,73 +130,31 @@ requires std::derived_from<T, IHashable>
 T* UnionFind<T>::Find(T* data)
 {
     int id;
-    T* pHead;
 
     id = this->findID(data);
-    pHead = this->_dataArray->Get(id);
-    assert(pHead != NULL);
 
-    return pHead;
+    return this->_dataArray->Get(id);
 }
 
 template <typename T>
 requires std::derived_from<T, IHashable>
 int UnionFind<T>::findID(T* data)
 {
-    T* pChild;
-    T* pParent;
-    int count;
-    int id;
-
-    assert(data != NULL);
-    pChild = NULL;
-    pParent = data;
-    count = 0;
-    while (pParent != pChild && count < MAX_ITER)
-    {
-        count++;
-        pChild = pParent;
-        id = this->getParentID(pChild);
-        pParent = this->_dataArray->Get(id);
-    }
-
-    if (count > ITER_TO_REDUCE)
-    {
-        this->compress(data, id);
-    }
-
-    if (count >= MAX_ITER)
-    {
-        std::cout << "UnionFind:findID:Maximum iterations reached" << std::endl;
-    }
-
-    return id;
-}
-
-template <typename T>
-requires std::derived_from<T, IHashable>
-void UnionFind<T>::compress(T* data, int id)
-{
-    T* pChild;
-    T* pParent;
-    int count;
+    int childID;
     int parentID;
+    int parentParentID;
 
-    assert(data != NULL);
-    pChild = NULL;
-    pParent = data;
-    count = 0;
-    while (pParent != pChild && count < MAX_ITER)
+    childID = -1; // never an ID
+    parentID = this->getID(data);
+    while (parentID != childID)
     {
-        count++;
-        pChild = pParent;
-        parentID = this->getParentID(pChild);
-        if (parentID != id)
-        {
-            this->setParentID(pChild, id);
-        }
-        pParent = this->_dataArray->Get(parentID);
+        childID = parentID;
+        parentID = this->getParentID(childID);
+        parentParentID = this->getParentID(parentID);
+        this->setParentID(childID, parentParentID);
     }
+
+    return parentID;
 }
 
 template <typename T>
@@ -177,7 +163,6 @@ void UnionFind<T>::Union(T* thisData, T* thatData)
 {
     int thisHeadID;
     int thatHeadID;
-    T* pHead;
 
     thisHeadID = this->findID(thisData);
     thatHeadID = this->findID(thatData);
@@ -190,55 +175,42 @@ void UnionFind<T>::Union(T* thisData, T* thatData)
     this->_count--;
     if (thisHeadID < thatHeadID)
     {
-        pHead = this->Find(thatData);
-        this->setParentID(pHead, thisHeadID);
+        this->setParentID(thatHeadID, thisHeadID);
     }
     else // thisHeadID > thatHeadID
     {
-        pHead = this->Find(thisData);
-        this->setParentID(pHead, thatHeadID);
+        this->setParentID(thisHeadID, thatHeadID);
     }
 }
 
 template <typename T>
 requires std::derived_from<T, IHashable>
-Array<int>* UnionFind<T>::ListComponentSizes(Array<int>* pArray)
+Heap<Integer>* UnionFind<T>::ComponentSizeHeap(Heap<Integer>* pHeap)
 {
-    HashTable<T,int> table;
-    HashTable<T,int>* pTable;
-    Array<T> headDataArray;
-    Array<T>* pHeadDataArray;
+    int* pArr;
     T* pData;
-    int* pInt;
+    int headID;
 
-    pTable = &table;
-    pHeadDataArray = &headDataArray;
+    pArr = (int*)calloc(this->_dataArray->Size(), sizeof(int));
+    assert(pArr != NULL);
     for (int i = 0; i < this->_dataArray->Size(); i++)
     {
         pData = this->_dataArray->Get(i);
-        pData = this->Find(pData);
-        if (pTable->Get(pData, &pInt))
-        {
-            (*pInt)++;
-        }
-        else
-        {
-            assert(pTable->Set(pData, new int(1)));
-            pHeadDataArray->Append(pData);
-        }
+        headID = this->findID(pData);
+        pArr[headID]++;
     }
 
-    for (int i = 0; i < pHeadDataArray->Size(); i++)
+    for (int i = 0; i < this->_dataArray->Size(); i++)
     {
-        pData = pHeadDataArray->Get(i);
-        assert(pTable->Get(pData, &pInt));
-        pArray->Append(pInt);
+        if (pArr[i] > 0)
+        {
+            pHeap->Add(new Integer(pArr[i]));
+        }
     }
 
-    pTable->Clear();
-    pHeadDataArray->Clear();
-
-    return pArray;
+    free(pArr);
+    pArr = NULL;
+    return pHeap;
 }
 
 template <typename T>

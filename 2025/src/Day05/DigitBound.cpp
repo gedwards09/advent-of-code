@@ -15,7 +15,7 @@ bool DigitBound::IsUpper()
     return this->_type == DigitBoundEnum::Upper;
 }
 
-int DigitBound::CompareTo(DigitBound* other)
+int DigitBound::CompareTo(DigitBound* other) const
 {
     int rc;
 

@@ -9,7 +9,7 @@ class HashableCoordinatePair : public Pair<IHashableCoordinate>, public ICompara
 {
     public:
         HashableCoordinatePair(IHashableCoordinate* left, IHashableCoordinate* right);
-        virtual int CompareTo(HashableCoordinatePair* other) override;
+        virtual int CompareTo(HashableCoordinatePair* other) const override;
         long long GetSquaredDistance() const;
         void Print() const;
 

@@ -6,8 +6,8 @@ class IEntry
 {
     public:
         virtual ~IEntry() = default;
-        virtual K* Key() = 0;
-        virtual V* Value() = 0;
+        virtual K* Key() const = 0;
+        virtual V* Value() const = 0;
         virtual void SetKey(K* key) = 0;
         virtual void SetValue(V* value) = 0;
 };

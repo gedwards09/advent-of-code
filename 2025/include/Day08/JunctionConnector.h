@@ -11,6 +11,7 @@
 #define ITER_LIMIT_BOUNDARY (128)
 
 typedef HashableCoordinate coord_t;
+typedef Array<coord_t> array_t;
 typedef UnionFind<IHashableCoordinate> union_find_t;
 typedef HashableCoordinatePair pair_t;
 typedef Heap<pair_t> heap_t;
@@ -31,6 +32,8 @@ class JunctionConnector
         union_find_t* _unionFind;
         const int _iterLimit;
 
+        void parseCoordinates(std::string contents[], size_t szContents, array_t* pArray);
         static coord_t* ConstructCoordinate(int coordArr[], int sz);
+        void buildEdges(array_t* pArray);
         long long multiplyTopConnectedSizes(int num);
 };

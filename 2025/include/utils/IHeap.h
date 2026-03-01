@@ -11,11 +11,11 @@ class IHeap
 {
     public:
         virtual ~IHeap() = default;
-        virtual Add(T* item) = 0;
+        virtual int Add(T* item) = 0;
         virtual T* Remove() = 0;
-        virtual T* Peek() = 0;
-        virtual bool IsEmpty() = 0;
-        virtual int Size() = 0;
+        virtual T* Peek() const = 0;
+        virtual bool IsEmpty() const = 0;
+        virtual int Size() const = 0;
         virtual void Clear() = 0;
 };
 
