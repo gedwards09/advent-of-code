@@ -109,11 +109,11 @@ void PaperRollMap::initializeDataStructures(p_hash_table_t pHashTable,
             if (this->isPaperRoll(xCoord, yCoord))
             {
                 neighbors = this->countNeighbors(xCoord, yCoord);
-                pCoord = new HashableCoordinate(new Coordinate(xCoord, yCoord));
+                pCoord = new HashableCoordinate(xCoord, yCoord);
                 pInt = new int(neighbors);
                 pHashTable->Set(pCoord, pInt);
 
-                pCoord = new HashableCoordinate(new Coordinate(xCoord, yCoord));
+                pCoord = new HashableCoordinate(xCoord, yCoord);
                 if (neighbors < ACCESS_LEVEL_CEIL)
                 {
                     pAccessibleList->Append(pCoord);
@@ -156,7 +156,7 @@ void PaperRollMap::DecrementNeighbors(HashTable<HashableCoordinate, int>* pHashT
                 continue;
             }
             
-            pCoord = new HashableCoordinate(new Coordinate(xCoord + dx, yCoord + dy));
+            pCoord = new HashableCoordinate(xCoord + dx, yCoord + dy);
             if (pHashTable->Get(pCoord, &pInt))
             {
                 (*pInt)--;

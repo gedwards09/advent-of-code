@@ -52,11 +52,9 @@ void JunctionConnector::parseCoordinates(std::string contents[], size_t szConten
 
 coord_t* JunctionConnector::ConstructCoordinate(int coordArr[], int sz)
 {
-    ICoordinate* pCoord;
-
     assert(sz >= SZ_DIM);
-    pCoord = new Coordinate(coordArr[0], coordArr[1], coordArr[2]);
-    return new HashableCoordinate(pCoord);
+    
+    return new HashableCoordinate(coordArr[0], coordArr[1], coordArr[2]);
 }
 
 void JunctionConnector::buildEdges(array_t* pArray)

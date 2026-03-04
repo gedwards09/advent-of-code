@@ -3,8 +3,8 @@
 
 #include "HashableCoordinatePair.h"
 
-HashableCoordinatePair::HashableCoordinatePair(IHashableCoordinate* left, IHashableCoordinate* right) : 
-        Pair<IHashableCoordinate>(left, right),
+HashableCoordinatePair::HashableCoordinatePair(HashableCoordinate* left, HashableCoordinate* right) : 
+        Pair<HashableCoordinate>(left, right),
         _dist(HashableCoordinatePair::ConstructSquaredDistance(left, right)) {  }
 
 long long HashableCoordinatePair::ConstructSquaredDistance(ICoordinate* left, ICoordinate* right)
@@ -12,21 +12,15 @@ long long HashableCoordinatePair::ConstructSquaredDistance(ICoordinate* left, IC
     return left->SquaredDistance(right);
 }
 
+/** Simply returning the difference might overflow an int here */
 int HashableCoordinatePair::CompareTo(HashableCoordinatePair* other) const
 {
+    long long diff;
+    
     assert(other != NULL);
-    if (this->_dist == other->_dist)
-    {
-        return 0;
-    }
-    else if (this->_dist > other->_dist)
-    {
-        return 1;
-    }
-    else // this->_dist < other->_dist
-    {
-        return -1;
-    }
+    diff = this->_dist - other->_dist;
+    
+    return (diff > 0) - (diff < 0);
 }
 
 long long HashableCoordinatePair::GetSquaredDistance() const

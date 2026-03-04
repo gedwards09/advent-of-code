@@ -12,10 +12,10 @@
 
 typedef HashableCoordinate coord_t;
 typedef Array<coord_t> array_t;
-typedef UnionFind<IHashableCoordinate> union_find_t;
+typedef UnionFind<HashableCoordinate> union_find_t;
 typedef HashableCoordinatePair pair_t;
 typedef Heap<pair_t> heap_t;
-typedef HashTable<IHashableCoordinate,int> table_t;
+typedef HashTable<HashableCoordinate,int> table_t;
 
 class JunctionConnector
 {

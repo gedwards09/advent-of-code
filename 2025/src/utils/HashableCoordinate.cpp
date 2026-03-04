@@ -6,13 +6,17 @@
 
 #include "HashableCoordinate.h"
 
-HashableCoordinate::~HashableCoordinate()
-{
-    delete this->_coord;
-}
+HashableCoordinate::HashableCoordinate() : 
+        Coordinate(), _hash() {  }
 
-HashableCoordinate::HashableCoordinate(ICoordinate* coord) : 
-        _coord(coord), _hash(HashableCoordinate::ConstructHash(coord)) {  }
+HashableCoordinate::HashableCoordinate(int x) : 
+        Coordinate(x), _hash(HashableCoordinate::ConstructHash(this)) {  }
+
+HashableCoordinate::HashableCoordinate(int x, int y) : 
+        Coordinate(x, y), _hash(HashableCoordinate::ConstructHash(this)) {  }
+
+HashableCoordinate::HashableCoordinate(int x, int y, int z) : 
+        Coordinate(x, y, z), _hash(HashableCoordinate::ConstructHash(this)) {  }
 
 hash_t HashableCoordinate::ConstructHash(ICoordinate* coord)
 {
@@ -26,41 +30,6 @@ hash_t HashableCoordinate::ConstructHash(ICoordinate* coord)
     _ = coord->Serialize(serializedData, szData);
 
     return Hasher::Hash((unsigned char*)serializedData, sizeof(int) * szData);
-}
-
-int HashableCoordinate::X() const
-{
-    return this->_coord->X();
-}
-
-int HashableCoordinate::Y() const
-{
-    return this->_coord->Y();
-}
-
-int HashableCoordinate::Z() const
-{
-    return this->_coord->Z();
-}
-
-size_t HashableCoordinate::Size() const
-{
-    return this->_coord->Size();
-}
-
-int* HashableCoordinate::Serialize(int arr[], size_t sz) const
-{
-    return this->_coord->Serialize(arr, sz);
-}
-
-long long HashableCoordinate::SquaredDistance(ICoordinate* other) const
-{
-    return this->_coord->SquaredDistance(other);
-}
-
-void HashableCoordinate::Print() const
-{
-    this->_coord->Print();
 }
 
 hash_t HashableCoordinate::Hash() const

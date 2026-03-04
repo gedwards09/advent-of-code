@@ -13,6 +13,7 @@ class ICoordinate
         virtual size_t Size() const = 0;
         virtual int* Serialize(int arr[], size_t sz) const = 0;
         virtual long long SquaredDistance(ICoordinate* other) const = 0;
+        virtual long long Area(ICoordinate* other) const = 0;
         virtual void Print() const = 0;
 };
 

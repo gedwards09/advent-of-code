@@ -2,13 +2,13 @@
 #define __HASHABLE_COORDINATE_PAIR_H__
 
 #include "IComparable.h"
-#include "IHashableCoordinate.h"
+#include "HashableCoordinate.h"
 #include "Pair.h"
 
-class HashableCoordinatePair : public Pair<IHashableCoordinate>, public IComparable<HashableCoordinatePair>
+class HashableCoordinatePair : public Pair<HashableCoordinate>, public IComparable<HashableCoordinatePair>
 {
     public:
-        HashableCoordinatePair(IHashableCoordinate* left, IHashableCoordinate* right);
+        HashableCoordinatePair(HashableCoordinate* left, HashableCoordinate* right);
         virtual int CompareTo(HashableCoordinatePair* other) const override;
         long long GetSquaredDistance() const;
         void Print() const;

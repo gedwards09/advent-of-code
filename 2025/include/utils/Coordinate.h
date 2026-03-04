@@ -3,9 +3,10 @@
 
 #include "ICoordinate.h"
 
-#define XIDX (0)
-#define YIDX (1)
-#define ZIDX (2)
+#define X_IDX (0)
+#define Y_IDX (1)
+#define Z_IDX (2)
+#define DIM_2 (2)
 
 class Coordinate : public ICoordinate
 {
@@ -20,6 +21,7 @@ class Coordinate : public ICoordinate
         virtual size_t Size() const override;
         virtual int* Serialize(int arr[], size_t sz) const override;
         virtual long long SquaredDistance(ICoordinate* other) const override;
+        virtual long long Area(ICoordinate* other) const override;
         virtual void Print() const override;
         
     private:
@@ -31,6 +33,7 @@ class Coordinate : public ICoordinate
         /** Private constructor */
         Coordinate(size_t sz, int x, int y, int z);
         int getAtPos(size_t i) const;
+        static int InclusiveDistance(int a, int b);
 };
 
 #endif // __COORDINATE_H__
