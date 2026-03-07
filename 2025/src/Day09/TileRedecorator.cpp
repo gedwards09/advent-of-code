@@ -13,10 +13,17 @@ TileRedecorator::~TileRedecorator()
     this->_x = NULL;
     delete this->_y;
     this->_y = NULL;
+    if (this->_areaArray != NULL)
+    {
+        this->_areaArray->DeleteAllAndClear();
+        delete this->_areaArray;
+        this->_areaArray = NULL;
+    }
 }
 
 TileRedecorator::TileRedecorator(std::string contents[], size_t szContents) :
-        _sz(szContents), _x(new int[szContents]()), _y(new int[szContents]())
+        _sz(szContents), _x(new int[szContents]()), _y(new int[szContents]()), 
+        _areaArray(new SortableArray<PairRectangle>())
 {
     std::string line;
     std::vector<std::string> vec;
@@ -45,6 +52,7 @@ long long TileRedecorator::BiggestRectangleArea()
         for (int j = i + 1; j < this->_sz; j++)
         {
             current = this->area(i, j);
+            this->_areaArray->Append(new PairRectangle(i, j, current));
             if (max < current)
             {
                 max = current;
@@ -64,30 +72,46 @@ long long TileRedecorator::area(int i, int j)
 
 long long TileRedecorator::BiggestRectangleWithinArea()
 {
-    long long max;
-    long long current;
-    long long theory;
+    PairRectangle* pRec;
+    int i;
+    int j;
+    long long recArea;
+    long long integrationArea;
 
-    max = 0;
+    if (this->_areaArray->Size() == 0)
+    {
+        this->initAreaArray();
+    }
+    this->_areaArray->Sort();
+
+    for (int index = this->_areaArray->Size() - 1; index >= 0; index--)
+    {
+        pRec = this->_areaArray->Get(index);
+        i = pRec->GetIndexI();
+        j = pRec->GetIndexJ();
+        recArea = pRec->GetArea();
+        integrationArea = this->calculateIntegrationArea(i, j);
+        if (integrationArea == recArea)
+        {
+            return integrationArea;
+        }
+    }
+
+    return 0;
+}
+
+void TileRedecorator::initAreaArray()
+{
+    long long area;
+
     for (int i = 0; i < this->_sz; i++)
     {
         for (int j = i + 1; j < this->_sz; j++)
         {
-            current = this->area(i, j);
-            if (current <= max)
-            {
-                continue;
-            }
-            
-            theory = this->calculateIntegrationArea(i, j);
-            if (theory == current)
-            {
-                max = current;
-            }
+            area = this->area(i, j);
+            this->_areaArray->Append(new PairRectangle(i, j, area));
         }
     }
-
-    return max;
 }
 
 long long TileRedecorator::calculateIntegrationArea(int home, int corner)

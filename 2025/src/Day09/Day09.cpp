@@ -1,15 +1,27 @@
-#include "TileRedecorator.h"
-
 #include "Day09.h"
+
+Day09::~Day09()
+{
+    if (this->_ptr == NULL)
+    {
+        delete this->_ptr;
+        this->_ptr = NULL;
+    }
+}
+
+Day09::Day09(std::string filename) : Solution(filename) {  }
 
 std::string Day09::SolveEasy()
 {
-    TileRedecorator tr(this->_contents, this->_szContents);
-    return std::to_string(tr.BiggestRectangleArea());
+    this->_ptr = new TileRedecorator(this->_contents, this->_szContents);
+    return std::to_string(this->_ptr->BiggestRectangleArea());
 }
 
 std::string Day09::SolveHard()
 {
-    TileRedecorator tr(this->_contents, this->_szContents);
-    return std::to_string(tr.BiggestRectangleWithinArea());
+    if (this->_ptr == NULL)
+    {
+        this->_ptr = new TileRedecorator(this->_contents, this->_szContents);
+    }
+    return std::to_string(this->_ptr->BiggestRectangleWithinArea());
 }

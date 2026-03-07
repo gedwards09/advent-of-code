@@ -4,8 +4,8 @@
 #include <iostream>
 #include <string>
 
-#include "Array.h"
-#include "ICoordinate.h"
+#include "PairRectangle.h"
+#include "SortableArray.h"
 
 #define DIM_2 (2)
 
@@ -23,8 +23,10 @@ class TileRedecorator
         int _sz;
         int* _x;
         int* _y;
+        SortableArray<PairRectangle>* _areaArray;
 
         long long area(int i, int j);
+        void initAreaArray();
         long long calculateIntegrationArea(int i, int j);
         static void SetMinMax(int thisNum, int thatNum, int* pMin, int* pMax);
         int deltaX(int cur, int next);
