@@ -4,7 +4,7 @@
 CXX = g++
 
 # Compiler flags
-CXXFLAGS = -std=c++20 -Wall -Wextra -Wreturn-type -g -MMD -MP
+CXXFLAGS = -std=c++20 -Wall -Wextra -Wreturn-type -g -MMD -MP -O3
 
 # Target executable
 TARGET = ./build/solution.exe

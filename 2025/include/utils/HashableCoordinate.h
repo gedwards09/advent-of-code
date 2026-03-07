@@ -4,7 +4,7 @@
 #include "Coordinate.h"
 #include "IHashable.h"
 
-#define SZ_MAX_ARR (2)
+#define SZ_MAX_ARR (3)
 
 class HashableCoordinate : public Coordinate, public IHashable
 {

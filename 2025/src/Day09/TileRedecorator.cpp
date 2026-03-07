@@ -1,39 +1,36 @@
-#include <string>
-
-#include "Array.h"
-#include "Coordinate.h"
-#include "IComparable.h"
-#include "Pair.h"
-#include "StringSplitter.h"
 
 #include <iostream>
+#include <string>
+
+#include "Coordinate.h"
+#include "StringSplitter.h"
 
 #include "TileRedecorator.h"
 
 TileRedecorator::~TileRedecorator()
 {
-    delete this->_array;
-    this->_array = NULL;
+    delete this->_x;
+    this->_x = NULL;
+    delete this->_y;
+    this->_y = NULL;
 }
 
 TileRedecorator::TileRedecorator(std::string contents[], size_t szContents) :
-        _array(new Array<ICoordinate>())
+        _sz(szContents), _x(new int[szContents]()), _y(new int[szContents]())
 {
     std::string line;
     std::vector<std::string> vec;
-    int xCoord;
-    int yCoord;
-    ICoordinate* pCoord;
+    int val;
 
     for (size_t i = 0; i < szContents; i++)
     {
         line = contents[i];
         vec = StringSplitter::Split(line, TileRedecorator::s_comma);
         assert(vec.size() == DIM_2);
-        xCoord = std::atoi(vec[0].c_str());
-        yCoord = std::atoi(vec[1].c_str());
-        pCoord = new Coordinate(xCoord, yCoord);
-        this->_array->Append(pCoord);
+        val = std::atoi(vec[0].c_str());
+        this->_x[i] = val;
+        val = std::atoi(vec[1].c_str());
+        this->_y[i] = val;
     }
 }
 
@@ -41,18 +38,14 @@ long long TileRedecorator::BiggestRectangleArea()
 {
     long long max;
     long long current;
-    ICoordinate* pCoord;
-    ICoordinate* pOther;
 
     max = 0;
-    for (int i = 0; i < this->_array->Size(); i++)
+    for (int i = 0; i < this->_sz; i++)
     {
-        pCoord = this->_array->Get(i);
-        for (int j = 0; j < this->_array->Size(); j++)
+        for (int j = i + 1; j < this->_sz; j++)
         {
-            pOther = this->_array->Get(j);
-            current = pCoord->Area(pOther);
-            if (current > max)
+            current = this->area(i, j);
+            if (max < current)
             {
                 max = current;
             }
@@ -62,32 +55,31 @@ long long TileRedecorator::BiggestRectangleArea()
     return max;
 }
 
+long long TileRedecorator::area(int i, int j)
+{
+    assert(0 <= i && i < this->_sz && 0 <= j && j<= this->_sz);
+    return Coordinate::InclusiveDistance(this->_x[i], this->_x[j]) 
+            * (long long)Coordinate::InclusiveDistance(this->_y[i], this->_y[j]);
+}
+
 long long TileRedecorator::BiggestRectangleWithinArea()
 {
-    int max;
-    int sz;
-    ICoordinate* pCoordHome;
-    ICoordinate* pCoordCorner;
-    int current;
-    int theory;
+    long long max;
+    long long current;
+    long long theory;
 
     max = 0;
-    sz = this->_array->Size();
-    for (int i = 0; i < sz; i++)
+    for (int i = 0; i < this->_sz; i++)
     {
-        // i = 2;
-        pCoordHome = this->_array->Get(i);
-        for (int j = i + 1; j < sz; j++)
+        for (int j = i + 1; j < this->_sz; j++)
         {
-            // j = 4;
-            pCoordCorner = this->_array->Get(j);
-            current = pCoordHome->Area(pCoordCorner);
-            if (current < max)
+            current = this->area(i, j);
+            if (current <= max)
             {
                 continue;
             }
             
-            theory = this->calculateIntegrationArea(pCoordHome, pCoordCorner);
+            theory = this->calculateIntegrationArea(i, j);
             if (theory == current)
             {
                 max = current;
@@ -98,41 +90,51 @@ long long TileRedecorator::BiggestRectangleWithinArea()
     return max;
 }
 
-long long TileRedecorator::calculateIntegrationArea(ICoordinate* pCoordHome, ICoordinate* pCoordCorner)
+long long TileRedecorator::calculateIntegrationArea(int home, int corner)
 {
     int xMin;
     int xMax;
     int yMin;
     int yMax;
     long long sum;
-    ICoordinate* pCoordNext;
-    ICoordinate* pCoordCur;
-    int lastHorizontalDirection;
+    int cur;
+    int next;
+    int nextNext;
+    int deltaX;
+    int lastDeltaX;
+    int nextDeltaX;
     long long delta;
-    ICoordinate* pCoordNextNext;
-    int nextHorizontalDirection;
 
-    TileRedecorator::SetMinMax(pCoordHome->X(), pCoordCorner->X(), &xMin, &xMax);
-    TileRedecorator::SetMinMax(pCoordHome->Y(), pCoordCorner->Y(), &yMin, &yMax);
+    TileRedecorator::SetMinMax(this->_x[home], this->_x[corner], &xMin, &xMax);
+    TileRedecorator::SetMinMax(this->_y[home], this->_y[corner], &yMin, &yMax);
 
     sum = 0;
-    pCoordNext = this->_array->Get(0);
-    for (int i = 0; i < this->_array->Size(); i++)
+    cur = 0;
+    next = 1;
+    nextNext = 2;
+    deltaX = 0;
+    lastDeltaX = 0;
+    nextDeltaX = 0;
+    for (int i = 0; i < this->_sz; i++)
     {
-        pCoordCur = pCoordNext;
-        //loop around if we get to the end.
-        pCoordNext = this->_array->Get(this->getIndex(i + 1));
-
-        if (!TileRedecorator::IsVerticalLine(pCoordCur, pCoordNext))
+        cur = next;
+        next = nextNext;
+        nextNext = i + 2;
+        if (nextNext >= this->_sz)
         {
-            lastHorizontalDirection = TileRedecorator::HorizontalDirection(pCoordCur, pCoordNext);
-            delta = TileRedecorator::IntegrateHorizontalPath(pCoordCur, pCoordNext, xMin, xMax, yMin, yMax);
+            nextNext -= this->_sz;
+        }
+
+        deltaX = this->deltaX(cur, next);
+        if (deltaX != 0) // direction horizontal
+        {
+            lastDeltaX = deltaX;
+            delta = this->integrateHorizontalPath(cur, next, xMin, xMax, yMin, yMax);
         }
         else
         {
-            pCoordNextNext = this->_array->Get(this->getIndex(i+2));
-            nextHorizontalDirection = TileRedecorator::HorizontalDirection(pCoordNext, pCoordNextNext);
-            delta = TileRedecorator::IntegrateVerticalPath(pCoordCur, pCoordNext, xMin, xMax, yMin, yMax, lastHorizontalDirection, nextHorizontalDirection);
+            nextDeltaX = this->deltaX(next, nextNext);
+            delta = this->integrateVerticalPath(cur, next, xMin, xMax, yMin, yMax, lastDeltaX, nextDeltaX);
         }
 
         sum += delta;
@@ -155,51 +157,21 @@ void TileRedecorator::SetMinMax(int thisNum, int thatNum, int* pMin, int* pMax)
     }
 }
 
-int TileRedecorator::getIndex(int i)
+int TileRedecorator::deltaX(int cur, int next)
 {
-    if (i >= this->_array->Size())
-    {
-        return i % this->_array->Size();
-    }
-    else
-    {
-        return i;
-    }
+    return this->_x[next] - this->_x[cur];
 }
 
-bool TileRedecorator::IsVerticalLine(ICoordinate* pHere, ICoordinate* pThere)
-{
-    if (pHere->X() == pThere->X())
-    {
-        return true;
-    }
-    else if (pHere->Y() == pThere->Y())
-    {
-        return false;
-    }
-    // unreachable
-    pHere->Print(); pThere->Print();
-    assert(false);
-}
-
-int TileRedecorator::HorizontalDirection(ICoordinate* pCoordCur, ICoordinate* pCoordNext)
-{
-    int deltaX;
-
-    deltaX = pCoordNext->X() - pCoordCur->X();
-
-    return (deltaX > 0) - (deltaX < 0);
-}
-
-long long TileRedecorator::IntegrateHorizontalPath(ICoordinate* pCoordCur, ICoordinate* pCoordNext, int xMin, int xMax, int yMin, int yMax)
+long long TileRedecorator::integrateHorizontalPath(int cur, int next, int xMin, int xMax, int yMin, int yMax)
 {
     int xCur;
     int xNext;
     int deltaX;
-    int y;
+    int yCur;
 
-    xCur = pCoordCur->X();
-    xNext = pCoordNext->X();
+    xCur = this->_x[cur];
+    yCur = this->_y[cur];
+    xNext = this->_x[next];
 
     // add one to the higher coordinate
     if (xCur > xNext)
@@ -209,19 +181,21 @@ long long TileRedecorator::IntegrateHorizontalPath(ICoordinate* pCoordCur, ICoor
     else
     {
         xNext++;
+        // subract one from height if we're moving "left"
+        yCur--;
+    }
+
+    if (yCur < yMin
+            || (xCur <= xMin && xNext <= xMin)
+            || (xMax < xCur && xMax < xNext))
+    {
+        return 0;
     }
 
     deltaX = TileRedecorator::MinMaxCap(xNext, xMin, xMax + 1) - TileRedecorator::MinMaxCap(xCur, xMin, xMax + 1);
+    yCur = TileRedecorator::MinMaxCap(yCur, yMin - 1, yMax) - (yMin - 1);
 
-    y = pCoordCur->Y();
-    if (xCur < xNext)
-    {
-        // subract one from height if we're moving "left"
-        y--;
-    }
-    y = TileRedecorator::MinMaxCap(y, yMin - 1, yMax) - (yMin - 1);
-
-    return y * (long long)deltaX;
+    return yCur * (long long)deltaX;
 }
 
 long long TileRedecorator::MinMaxCap(int t, int tMin, int tMax)
@@ -240,38 +214,38 @@ long long TileRedecorator::MinMaxCap(int t, int tMin, int tMax)
     }
 }
 
-long long TileRedecorator::IntegrateVerticalPath(ICoordinate* pCoordCur, ICoordinate* pCoordNext, int xMin, int xMax, int yMin, int yMax, int lastHorizontalDirection, int nextHorizontalDirection)
+long long TileRedecorator::integrateVerticalPath(int cur, int next, int xMin, int xMax, int yMin, int yMax, int lastDeltaX, int nextDeltaX)
 {
-    if (lastHorizontalDirection != nextHorizontalDirection)
+    if ((lastDeltaX <= 0 && 0 <= nextDeltaX)
+            || (nextDeltaX <= 0 && 0 <= lastDeltaX))
     {
         // do nothing
         return 0;
     }
-    else // continuation
+    
+    // else continuation
+    if (this->_x[cur] < xMin || xMax < this->_x[cur])
     {
-        if (pCoordCur->X() < xMin || xMax < pCoordCur->X())
-        {
-            // do nothing
-            return 0;
-        } 
+        // do nothing
+        return 0;
+    } 
 
-        if (lastHorizontalDirection > 0)
-        {
-            return TileRedecorator::IntegrateVerticalPathContinuationRight(pCoordCur, yMin, yMax);
-        }
-        else
-        {
-            return TileRedecorator::IntegrateVerticalPathContinuationLeft(pCoordNext, yMin, yMax);
-        }
+    if (lastDeltaX > 0)
+    {
+        return TileRedecorator::integrateVerticalPathContinuationRight(cur, yMin, yMax);
+    }
+    else
+    {
+        return TileRedecorator::integrateVerticalPathContinuationLeft(next, yMin, yMax);
     }
 }
 
-long long TileRedecorator::IntegrateVerticalPathContinuationRight(ICoordinate* pCoordCur, int yMin, int yMax)
+long long TileRedecorator::integrateVerticalPathContinuationRight(int cur, int yMin, int yMax)
 {
-    return (long long)(yMin - 1) - TileRedecorator::MinMaxCap(pCoordCur->Y() - 1, yMin - 1, yMax);
+    return (long long)(yMin - 1) - TileRedecorator::MinMaxCap(this->_y[cur] - 1, yMin - 1, yMax);
 }
 
-long long TileRedecorator::IntegrateVerticalPathContinuationLeft(ICoordinate* pCoordNext, int yMin, int yMax)
+long long TileRedecorator::integrateVerticalPathContinuationLeft(int next, int yMin, int yMax)
 {
-    return (long long)TileRedecorator::MinMaxCap(pCoordNext->Y(), yMin - 1, yMax) - (yMin - 1);
+    return (long long)TileRedecorator::MinMaxCap(this->_y[next], yMin - 1, yMax) - (yMin - 1);
 }

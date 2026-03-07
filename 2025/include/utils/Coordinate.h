@@ -24,6 +24,8 @@ class Coordinate : public ICoordinate
         virtual long long Area(ICoordinate* other) const override;
         virtual void Print() const override;
         
+        static int InclusiveDistance(int a, int b);
+        
     private:
         static const int s_defaultValue = 0;
 
@@ -33,7 +35,6 @@ class Coordinate : public ICoordinate
         /** Private constructor */
         Coordinate(size_t sz, int x, int y, int z);
         int getAtPos(size_t i) const;
-        static int InclusiveDistance(int a, int b);
 };
 
 #endif // __COORDINATE_H__
