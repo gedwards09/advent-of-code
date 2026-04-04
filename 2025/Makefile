@@ -1,13 +1,11 @@
-# Makefile for Cheese project
-
 # Compiler
 CXX = g++
 
 # Compiler flags
-CXXFLAGS = -std=c++20 -Wall -Wextra -Wreturn-type -g -MMD -MP -O3
+CXXFLAGS = -std=c++20 -Wall -Wextra -Wreturn-type -g -MMD -MP
 
 # Target executable
-TARGET = ./build/solution.exe
+TARGET = ./build/solution
 
 # Runtime arguments
 RUN_ARGS ?=
@@ -40,7 +38,7 @@ $(TARGET): $(OBJECTS)
 
 # Clean up build files
 clean:
-	rm -f $(OBJECTS) $(DEPS) $(TARGET) $(TARGET).exe
+	rm -f $(OBJECTS) $(DEPS) $(TARGET).exe
 
 # Rebuild everything
 rebuild: clean all

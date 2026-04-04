@@ -21,6 +21,7 @@ class HashTable
         bool Delete(K* key);
         HashTableEntry<K,V>* FindKey(K* key);
         void DeleteValuesAndClear();
+        void DeleteKeysAndClear();
         void Clear();
 
     private:
@@ -102,11 +103,14 @@ bool HashTable<K,V>::Set(K* key, V* value)
 
     pEntry = this->FindKey(key);
     isNewKey = (pEntry->Key() == NULL);
-    if (isNewKey && pEntry->Value() == NULL)
+    if (pEntry->Key() == NULL)
     {
-        this->_count++;
+        if (pEntry->Value() == NULL)
+        {
+            this->_count++;
+        }
     }
-    else if (!isNewKey)
+    else
     {
         if (pEntry->Key() != key)
         {
@@ -292,6 +296,32 @@ void HashTable<K,V>::DeleteValuesAndClear()
         if (pEntry->Value() != NULL && pEntry->Value() != (V*)&HashTable<K,V>::s_deleted)
         {
             delete pEntry->Value();
+        }
+        pEntry->SetValue(NULL);
+        pEntry->SetKey(NULL);
+    }
+    delete[] this->_entries;
+    this->_entries = NULL;
+    this->_capacity = 0;
+    this->_count = 0;
+}
+
+/** 
+ * Deletes keys but not values and clears table.
+ * Use for non-owned values.
+ */
+template <typename K, typename V>
+requires std::derived_from<K, IHashable>
+void HashTable<K,V>::DeleteKeysAndClear()
+{
+    Entry<K,V>* pEntry;
+
+    for (int i = 0; i < this->_capacity; i++)
+    {
+        pEntry = &this->_entries[i];
+        if (pEntry->Key() != NULL)
+        {
+            delete pEntry->Key();
         }
         pEntry->SetValue(NULL);
         pEntry->SetKey(NULL);
