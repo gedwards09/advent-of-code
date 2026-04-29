@@ -197,7 +197,10 @@ size_t LightConfig::ReadJoltage(
 }
 
 // do nothing
-void LightConfig::AppendJoltageToArray(uint8_t value) {  }
+void LightConfig::AppendJoltageToArray(uint8_t value)
+{
+    (void)value;
+}
 
 int LightConfig::Search()
 {
