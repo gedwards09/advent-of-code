@@ -1,3 +1,4 @@
+#include "AdvLightConfig.h"
 #include "LightConfig.h"
 
 #include "Day10.h"
@@ -10,5 +11,6 @@ std::string Day10::SolveEasy()
 
 std::string Day10::SolveHard()
 {
-    return "";
+    AdvLightConfig alc;
+    return std::to_string(alc.SolveAll(this->_contents, this->_szContents));
 }

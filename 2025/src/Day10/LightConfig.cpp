@@ -1,5 +1,4 @@
 #include <cassert>
-#include <iostream>
 
 #include "HashTable.h"
 #include "Queue.h"
