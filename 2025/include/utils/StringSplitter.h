@@ -7,8 +7,8 @@
 class StringSplitter
 {
     public:
-        ~StringSplitter() = default;
-        StringSplitter();
         static std::vector<std::string> Split(std::string str, char delim);
+        static std::string Piece(std::string str, char delim, char piece);
 };
+
 #endif // __STRING_SPLITER_H_
