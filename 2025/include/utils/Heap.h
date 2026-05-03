@@ -24,6 +24,7 @@ class Heap : IHeap<T, S>
         virtual bool IsEmpty() const override;
         virtual int Size() const override;
         virtual void Clear() override;
+        virtual void DeleteAllAndClear() override;
 
     private:
         T** _array;
@@ -228,6 +229,17 @@ int Heap<T,S>::Size() const
 template<typename T, typename S>
 requires std::derived_from<T, S> && std::derived_from<T, IComparable<S>>
 void Heap<T,S>::Clear()
+{
+    free(this->_array);
+    this->_array = NULL;
+    this->_count = 0;
+    this->_capacity = 0;
+}
+
+
+template<typename T, typename S>
+requires std::derived_from<T, S> && std::derived_from<T, IComparable<S>>
+void Heap<T,S>::DeleteAllAndClear()
 {
     for (int i = 1; i <= this->_count; i++)
     {

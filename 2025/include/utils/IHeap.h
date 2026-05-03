@@ -17,6 +17,7 @@ class IHeap
         virtual bool IsEmpty() const = 0;
         virtual int Size() const = 0;
         virtual void Clear() = 0;
+        virtual void DeleteAllAndClear() = 0;
 };
 
 #endif // __I_HEAP_H__
