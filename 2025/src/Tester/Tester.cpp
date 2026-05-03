@@ -85,7 +85,7 @@ void Tester::RunPart(ISolution* solution, int dayNum,
     if (!fs::exists(outPath) || !fs::is_regular_file(outPath))
     {
         std::cout << "Day " << dayNum << " Test: " << inputFilename
-                  << " Part " << partNum << " Skipped: " << outPath.string()
+                  << " Part " << partNum << " Skipped: " << outPath.filename().string()
                   << " not found." << std::endl;
         return;
     }
