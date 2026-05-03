@@ -101,7 +101,6 @@ IntegerTableau* AdvLightConfig::ConstructMatrix()
     int numRow;
     int numCol;
     int szDataArr;
-    int* pDataArr;
     int idxRowNum;
     int idxColNum;
     uint16_t button;
@@ -111,7 +110,8 @@ IntegerTableau* AdvLightConfig::ConstructMatrix()
     numRow = numConstraints + 2;
     numCol = numButtons + 3;
     szDataArr = numRow * numCol;
-    pDataArr = new int[szDataArr];
+    
+    int dataArr[szDataArr];
     
     for (idxColNum = 0; idxColNum < numCol - 1; idxColNum++)
     {
@@ -120,11 +120,11 @@ IntegerTableau* AdvLightConfig::ConstructMatrix()
         idxRowNum = 0;
         if (idxColNum == 0)
         {
-            pDataArr[idxRowNum * numCol + idxColNum] = 1;
+            dataArr[idxRowNum * numCol + idxColNum] = 1;
         }
         else
         {
-            pDataArr[idxRowNum * numCol + idxColNum] = 0;
+            dataArr[idxRowNum * numCol + idxColNum] = 0;
         }
         
         // 2nd row: Objective Equation
@@ -132,15 +132,15 @@ IntegerTableau* AdvLightConfig::ConstructMatrix()
         idxRowNum++;
         if (idxColNum == 1)
         {
-            pDataArr[idxRowNum * numCol + idxColNum] = 1;
+            dataArr[idxRowNum * numCol + idxColNum] = 1;
         }
         else if (2 <= idxColNum && idxColNum < numButtons + 2)
         {
-            pDataArr[idxRowNum * numCol + idxColNum] = -1;
+            dataArr[idxRowNum * numCol + idxColNum] = -1;
         }
         else
         {
-            pDataArr[idxRowNum * numCol + idxColNum] = 0;
+            dataArr[idxRowNum * numCol + idxColNum] = 0;
         }
 
 
@@ -150,7 +150,7 @@ IntegerTableau* AdvLightConfig::ConstructMatrix()
             // objective cols
             for (  ; idxRowNum < numRow; idxRowNum++)
             {
-                pDataArr[idxRowNum * numCol + idxColNum] = 0;
+                dataArr[idxRowNum * numCol + idxColNum] = 0;
             }
         }
         else
@@ -159,7 +159,7 @@ IntegerTableau* AdvLightConfig::ConstructMatrix()
             button = this->_buttonArray[idxColNum-2];
             for (  ; idxRowNum < numRow; idxRowNum++)
             {
-                pDataArr[idxRowNum * numCol + idxColNum] = (button & 0x01);
+                dataArr[idxRowNum * numCol + idxColNum] = (button & 0x01);
                 button >>= 1;
             }
         }
@@ -170,14 +170,13 @@ IntegerTableau* AdvLightConfig::ConstructMatrix()
     {
         if (i < 2)
         {
-            pDataArr[(i + 1) * numCol - 1] = 0;
+            dataArr[(i + 1) * numCol - 1] = 0;
         }
         else
         {
-            pDataArr[(i + 1) * numCol - 1] = (int)this->_joltageArray[i-2];
+            dataArr[(i + 1) * numCol - 1] = (int)this->_joltageArray[i-2];
         }
     }
 
-
-    return new IntegerTableau(numRow, numCol, pDataArr, szDataArr);
+    return new IntegerTableau(numRow, numCol, dataArr, szDataArr);
 }

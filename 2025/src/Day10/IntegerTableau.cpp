@@ -7,8 +7,20 @@
 
 IntegerTableau::~IntegerTableau()
 {
+    for (int i = 0; i < MAX_ROWS; i++)
+    {
+        if (this->_ppRow[i] != NULL)
+        {
+            delete[] this->_ppRow[i];
+            this->_ppRow[i] = NULL;
+        }
+    }
+
     delete[] this->_ppRow;
     this->_ppRow = NULL;
+
+    delete[] this->_pBranchSet;
+    this->_pBranchSet = NULL;
 }
 
 IntegerTableau::IntegerTableau(int numRows, int numCols) : 
