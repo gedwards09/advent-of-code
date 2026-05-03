@@ -52,26 +52,45 @@ float LPSimplexSolver::SolveILP(IntegerTableau* pMat, float* pUpperBound, bool* 
     return LPSimplexSolver::ApplyBranchAndBoundMethod(pMat, pivotColNum, objRowNum, pUpperBound, pIsIntegral);
 }
 
-
 float LPSimplexSolver::SolveRelaxedLP(IntegerTableau* pMat)
 {
-    int numRows;
+    bool isFeasible;
+    int objRowNum;
+
+    isFeasible = LPSimplexSolver::SolveRelaxedLPPhaseI(pMat);
+    if (!isFeasible)
+    {
+        return -1;
+    }
+
+    LPSimplexSolver::SolveRelaxedLPPhaseII(pMat);
+
+    objRowNum = 1;
+    return LPSimplexSolver::GetMaxObjectiveValue(pMat, objRowNum);
+}
+
+bool LPSimplexSolver::SolveRelaxedLPPhaseI(IntegerTableau* pMat)
+{
+    int dataRowNum;
     int numCols;
+    int tgtColNum;
     int objRowNum;
     int stopColNum;
     int colNum;
     int element;
     int pivotRow;
-    int endColNum;
     int inVarNum;
     int outVarNum;
-    int tgtColNum;
+    
+    
+    dataRowNum = 2;
+    pMat->ExtendArtificalColumns(dataRowNum);
 
-    numRows = pMat->NumRows();
     numCols = pMat->NumColumns();
+    tgtColNum = numCols - 1;
+    objRowNum = 0;
 
     // Phase I
-    objRowNum = 0;
     stopColNum = -1;
     for (colNum = 0; colNum < numCols; colNum++)
     {
@@ -82,8 +101,8 @@ float LPSimplexSolver::SolveRelaxedLP(IntegerTableau* pMat)
             {
                 stopColNum = colNum;
             }
-            pivotRow = LPSimplexSolver::FindPivotRow(pMat, objRowNum, colNum);
 
+            pivotRow = LPSimplexSolver::FindPivotRow(pMat, objRowNum, colNum);
             if (pivotRow < 0)
             {
                 continue;
@@ -93,21 +112,19 @@ float LPSimplexSolver::SolveRelaxedLP(IntegerTableau* pMat)
         }
     }
 
-    endColNum = numCols - 1;
-    inVarNum = LPSimplexSolver::SelectEnteringVariable(pMat, objRowNum, endColNum);
+    inVarNum = LPSimplexSolver::SelectEnteringVariable(pMat, objRowNum, tgtColNum);
     while (0 <= inVarNum && inVarNum < numCols)
     {
         outVarNum = LPSimplexSolver::SelectLeavingVariable(pMat, objRowNum, inVarNum);
         LPSimplexSolver::PivotVariable(pMat, inVarNum, outVarNum);
 
-        inVarNum = LPSimplexSolver::SelectEnteringVariable(pMat, objRowNum, endColNum);
+        inVarNum = LPSimplexSolver::SelectEnteringVariable(pMat, objRowNum, tgtColNum);
     }
 
-    tgtColNum = numCols - 1;
     if (pMat->Element(objRowNum, tgtColNum) != 0)
     {
         // no feasible solution
-        return -1;
+        return false;
     }
 
     // Phase I Cleanup
@@ -141,11 +158,25 @@ float LPSimplexSolver::SolveRelaxedLP(IntegerTableau* pMat)
 
     pMat->ColumnSwap(stopColNum, numCols - 1);
     pMat->RetractColumns(numCols - stopColNum - 1);
+
+    return true;
+}
+
+void LPSimplexSolver::SolveRelaxedLPPhaseII(IntegerTableau* pMat)
+{
+    int objRowNum;
+    int numRows;
+    int numCols;
+    int stopColNum;
+    int inVarNum;
+    int outVarNum;
+
+    objRowNum = 1;
+    numRows = pMat->NumRows();
     numCols = pMat->NumColumns();
+    stopColNum = numCols - 1;
 
     // Phase II
-    objRowNum++;
-    stopColNum = numCols - 1;
     inVarNum = LPSimplexSolver::SelectEnteringVariable(pMat, objRowNum, stopColNum);
     while (0 <= inVarNum && inVarNum < stopColNum)
     {
@@ -161,8 +192,6 @@ float LPSimplexSolver::SolveRelaxedLP(IntegerTableau* pMat)
             pMat->RowMult(i, -1);
         }
     }
-
-    return LPSimplexSolver::GetMaxObjectiveValue(pMat, objRowNum);
 }
 
 int LPSimplexSolver::SelectEnteringVariable(IntegerTableau* pMat, int objRowNum, int endColNum)
@@ -426,7 +455,6 @@ void LPSimplexSolver::ExtendTableau(IntegerTableau* pMat, int colNum, int dir, i
 {
     int szRow = pMat->NumColumns();
     int data[MAX_COLUMNS];
-    int dataRowNum;
 
     for (int i = 0; i < MAX_COLUMNS; i++)
     {
@@ -454,10 +482,6 @@ void LPSimplexSolver::ExtendTableau(IntegerTableau* pMat, int colNum, int dir, i
 
     //swap the target column with our slack variable column
     pMat->ColumnSwap(szRow - 1, szRow);
-
-    // create atrifical slack variable columns
-    dataRowNum = 2;
-    pMat->ExtendArtificalColumns(dataRowNum);
 }
 
 float LPSimplexSolver::GetMaxObjectiveValue(IntegerTableau* pMat, int objRowNum)

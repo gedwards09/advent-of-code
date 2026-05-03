@@ -109,30 +109,26 @@ IntegerTableau* AdvLightConfig::ConstructMatrix()
     numButtons = this->_szButtonArray;
     numConstraints = this->_szJoltageArray;
     numRow = numConstraints + 2;
-    numCol = numButtons + numConstraints + 3;
+    numCol = numButtons + 3;
     szDataArr = numRow * numCol;
     pDataArr = new int[szDataArr];
     
     for (idxColNum = 0; idxColNum < numCol - 1; idxColNum++)
     {
-        // 1st row: dummy variables
-        // W = u_1 + ... + u_n
+        // 1st row: dummy variable objective
+        // W coefficient only; artificial columns added later
         idxRowNum = 0;
         if (idxColNum == 0)
         {
             pDataArr[idxRowNum * numCol + idxColNum] = 1;
-        }
-        else if (numButtons + 2 <= idxColNum && idxColNum < numCol - 1)
-        {
-            pDataArr[idxRowNum * numCol + idxColNum] = -1;
         }
         else
         {
             pDataArr[idxRowNum * numCol + idxColNum] = 0;
         }
         
-        // 2nd row: Objective Equaltion
-        // total = a_n + ... + a_n
+        // 2nd row: Objective Equation
+        // total = a_1 + ... + a_n
         idxRowNum++;
         if (idxColNum == 1)
         {
@@ -157,7 +153,7 @@ IntegerTableau* AdvLightConfig::ConstructMatrix()
                 pDataArr[idxRowNum * numCol + idxColNum] = 0;
             }
         }
-        else if (2 <= idxColNum && idxColNum < numButtons + 2)
+        else
         {
             // data cols
             button = this->_buttonArray[idxColNum-2];
@@ -167,24 +163,9 @@ IntegerTableau* AdvLightConfig::ConstructMatrix()
                 button >>= 1;
             }
         }
-        else if (numButtons + 2 <= idxColNum)
-        {
-            // dummary variable identity columns
-            for (  ; idxRowNum < numRow; idxRowNum++)
-            {
-                if (idxRowNum - 2 == idxColNum - 2 - numButtons)
-                {
-                    pDataArr[idxRowNum * numCol + idxColNum] = 1;
-                }
-                else
-                {
-                    pDataArr[idxRowNum * numCol + idxColNum] = 0;
-                }
-            }
-        }
     }
 
-    // set the last column with constaints
+    // set the last column with constraints
     for (int i = 0; i < numRow; i++)
     {
         if (i < 2)

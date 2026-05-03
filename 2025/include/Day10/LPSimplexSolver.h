@@ -9,6 +9,8 @@ class LPSimplexSolver
         static long long Solve(IntegerTableau* pMat);
         static float SolveILP(IntegerTableau* pMat, float* pUpperBound, bool* pIsIntegral);
         static float SolveRelaxedLP(IntegerTableau* pMat);
+        static bool SolveRelaxedLPPhaseI(IntegerTableau* pMat);
+        static void SolveRelaxedLPPhaseII(IntegerTableau* pMat);
         static int SelectEnteringVariable(IntegerTableau* pMat, int objRowNum, int endColNum);
         static int SelectLeavingVariable(IntegerTableau* pMat, int objRowNum, int colNum);
         static void PivotVariable(IntegerTableau* pMat, int colNum, int pivotRow);
