@@ -12,5 +12,6 @@
 #include "Day09.h"
 #include "Day10.h"
 #include "Day11.h"
+#include "Day12.h"
 
 #endif // __DAYS_H__

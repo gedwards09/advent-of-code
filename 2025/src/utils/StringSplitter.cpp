@@ -18,14 +18,14 @@ std::vector<std::string> StringSplitter::Split(std::string str, char delim)
     return tokens;
 }
 
-std::string StringSplitter::Piece(std::string str, char delim, char piece)
+std::string StringSplitter::Piece(std::string str, char delim, size_t piece)
 {
     std::vector<std::string> pieces;
 
     pieces = StringSplitter::Split(str, delim);
     if (piece < pieces.size())
     {
-        return pieces[0];
+        return pieces[piece];
     }
     else
     {
